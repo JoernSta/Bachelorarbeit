@@ -137,7 +137,6 @@ public class Datengenerator {
 			Request request = new Request(id,randomRequestTime,pickUp,dropOff,passengerNr,state,type,window);
 			requests.add(request);
 		}
-		
 	}
 */	
 	public static int createRandomNumber(int untereGrenze, int obereGrenze){

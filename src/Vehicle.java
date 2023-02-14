@@ -20,17 +20,19 @@ public class Vehicle {
 	public ArrayList<Request> currentPassengers;
 	public ArrayList<Stopp> currentTour;
 	public boolean hasTour;
+	int usedCap;
 
 	
 
-	public Vehicle(int id, Point p, int cap, int speed, ArrayList<Request> assignedReq, ArrayList<Request> curPas, ArrayList<Stopp> curTour) {
+	public Vehicle(int id, Point p, int cap, int speed, ArrayList<Request> assignedReq, ArrayList<Request> curPas, ArrayList<Stopp> curTour,int usedCap) {
 		this.id = id;
 		this.position =  p;
 		this.capacity = cap;
 		this.speed = speed;
 		this.assignedRequests = assignedReq;
 		this.currentPassengers = curPas;
-		this.currentTour = curTour;		
+		this.currentTour = curTour;
+		this.usedCap = usedCap;
 	}
 	
 	public int getId(){
@@ -114,10 +116,15 @@ public class Vehicle {
 		return specificRequest;
 	}
 	
-	//Methode, welche das Touring darstellt
-	public void touring(){
-		
+	public int getUsedCap(){
+		return usedCap;
 	}
+	
+	public void setUsedCap(int i){
+		this.usedCap = i;
+	}
+	
+	
 	
 	
 	

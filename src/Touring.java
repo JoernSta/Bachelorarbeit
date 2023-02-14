@@ -36,6 +36,10 @@ public class Touring {
 									int currentCapacity = vehicle.getCapacity();
 									int updatedCapacity = currentCapacity + passengersOfStopp;
 									vehicle.setCapacity(updatedCapacity);
+									int usedCapOfVehicle = vehicle.getUsedCap();
+									if(updatedCapacity > usedCapacityOfVehicle){
+										vehicle.setUsedCap(updatedCapacity);
+									}
 									int requestIdOfStopp = currentStopp.getRequestId();
 									searchRequests:
 									for(int x =0; x < requests.size(); x++){
