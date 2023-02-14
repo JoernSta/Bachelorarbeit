@@ -481,29 +481,22 @@ public class Assignment {
 	public static void chooseTour(ArrayList<AssignedVehicle> assignedVehicles,double endTime, int maxMovingPosition, int maxCapacity, Request request, ArrayList<Vehicle> vehicles,ArrayList<Times> waitingTimesOfCustomers,double maxWaitingTime){
 		//ArrayList<AssignedVehicle> copyOfList = new ArrayList<>(assignedVehicles);
 		
-		for(int i = 0; i < assignedVehicles.size();i++){
-			int index = i;
+		for(int i=0; i < assignedVehicles.size(); i++) {
 			AssignedVehicle currentElement = assignedVehicles.get(i);
 			Vehicle currentVehicle = currentElement.getVehicle();
 			int currentVehicleCapacity = currentVehicle.getCapacity();
 			ArrayList<Stopp> currentTour = currentElement.getTour();
-			//ueberpruefe die Einhaltung der Restriktionen:
-			//Fehler bei der Kapazitaetsrestriktion
-			if(!checkCapacity(currentVehicle, currentTour,maxCapacity)){
-				assignedVehicles.remove(index);
-				i = index - 1;
-			}
-			if(!checkReturnToTransferPoint(currentTour,endTime)){
-				assignedVehicles.remove(index);
-				i = index - 1;
-			}
-			if(!checkTimesOfTour(currentTour)){
-				assignedVehicles.remove(index);
-				i = index - 1;
-			}
-			if(!checkSwap(currentTour,maxMovingPosition)){
-				assignedVehicles.remove(index);
-				i = index - 1;
+
+			// ueberpruefe die Einhaltung der Restriktionen:
+			// Fehler bei der Kapazitaetsrestriktion
+			if(!(
+					checkCapacity(currentVehicle, currentTour,maxCapacity) &&
+					checkReturnToTransferPoint(currentTour,endTime) &&
+					checkTimesOfTour(currentTour) &&
+					checkSwap(currentTour,maxMovingPosition)
+			)) {
+				assignedVehicles.remove(i);
+				i--;
 			}
 		}
 		
