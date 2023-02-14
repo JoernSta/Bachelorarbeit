@@ -1,4 +1,5 @@
 import java.awt.Point;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -32,9 +33,7 @@ public class Datengenerator {
 		double [] trainTimes = createTrainTravelTimes(end,start);
 		createTypeOneRequests(a,createRequests,start,end,trainTimes, lastRequestTime);
 		createTypeTwoRequests(b,createRequests,start,end,trainTimes, lastRequestTime);
-		
-		
-		
+
 		//Sortierung der Liste nach requestTime
 		Collections.sort(createRequests);
 		//Id' werden neu gesetzt
@@ -43,7 +42,6 @@ public class Datengenerator {
 			int id = j+1;
 			Request req = createRequests.get(j);
 			req.setId(id);
-			
 		}
 		return createRequests;
 	}
@@ -149,4 +147,33 @@ public class Datengenerator {
 		return randomNumber;
 	}
 
+	public static void exportRequests(ArrayList<Request> requests, File outFile) {
+
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
+			for(Request request: requests) {
+				writer.write(request.toCsv() + "\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static ArrayList<Request> importRequests(File inFile) {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(inFile));
+			String line = reader.readLine();
+
+			ArrayList<Request> requests = new ArrayList<>();
+			while(line != null) {
+				requests.add(Request.fromCsv(line));
+				line = reader.readLine();
+			}
+
+			return requests;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

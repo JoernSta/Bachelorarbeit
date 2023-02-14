@@ -1,4 +1,6 @@
 import java.awt.Point;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -451,11 +453,18 @@ public class Simulation {
 
 		return (servedRequests / size) * 100;
 	}
-
 	
 	public static void main(String[] args) {
-		allRequests = Datengenerator.createRequests(typeOneRequests,typeTwoRequests,startTime,endTime, lastFeasibleRequestTime);
-		printRequests(allRequests);
+		File requestsFile = new File("test_data1.csv");
+
+		if(!requestsFile.exists()) {
+			ArrayList<Request> requests = Datengenerator.createRequests(typeOneRequests, typeTwoRequests, startTime, endTime, lastFeasibleRequestTime);
+			Datengenerator.exportRequests(requests, requestsFile);
+		}
+
+		allRequests = Datengenerator.importRequests(requestsFile);
+
+		// printRequests(allRequests);
 		createVehicles(countVehicle,speed);
 		// testMethodSwapping(allVehicles);
 		// flowSimulation(allRequests,allVehicles);
@@ -467,7 +476,7 @@ public class Simulation {
 		//Test mit Strategie 0
 		//startSimulation(waitingStrategyAtCurrentPosition,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
 		//Test mit Strategie 1
-		startSimulation(waitingStrategyCenterOfGravity,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
+		// startSimulation(waitingStrategyCenterOfGravity,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
 		//Test mit Strategie 2:
 		//startSimulation(waitingStrategyDriveFirst,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
 
@@ -476,7 +485,7 @@ public class Simulation {
 		// Test mit Strategie 1
 		// startSimulation(waitingStrategyCenterOfGravity,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
 		// Test mit Strategie 2:
-		//startSimulation(waitingStrategyDriveFirst,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
+		startSimulation(waitingStrategyDriveFirst,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
 
 		
 		// printOutput(waitingTimesOfCustomers,allRequests);

@@ -25,7 +25,7 @@ public class Request implements Comparable<Request> {
 	public int passengerState;
 
 	
-	public Request(int id, double requestTime, Point pickUp,Point delivery, int passengerNr, int state,int type, double serviceTime ) {
+	public Request(int id, double requestTime, Point pickUp, Point delivery, int passengerNr, int state, int type, double serviceTime) {
 		this.id = id;
 		this.requestTime = requestTime;
 		this.pickUpPoint = pickUp;
@@ -34,6 +34,34 @@ public class Request implements Comparable<Request> {
 		this.passengerState = state;
 		this.requestType = type;
 		this.serviceTime = serviceTime;
+	}
+
+	public String toCsv() {
+		return this.id + "," + this.requestTime + "," + this.pickUpPoint.x + "," + this.pickUpPoint.y + "," +
+				this.dropOff.x + "," + this.dropOff.y + "," + this.passengerNr + "," + this.passengerState + "," +
+				this.requestType + "," + this.serviceTime;
+	}
+
+	public static Request fromCsv(String csv) {
+		String [] parts = csv.split(",");
+
+		if(parts.length != 10) {
+			throw new IllegalArgumentException("Invalid CSV line while parsing `Request`: " + csv);
+		}
+
+		int id = Integer.parseInt(parts[0]);
+		double requestTime = Double.parseDouble(parts[1]);
+		int pickUpPointX = Integer.parseInt(parts[2]);
+		int pickUpPointY = Integer.parseInt(parts[3]);
+		int dropOffX = Integer.parseInt(parts[4]);
+		int dropOffY = Integer.parseInt(parts[5]);
+		int passengerNr = Integer.parseInt(parts[6]);
+		int passengerState = Integer.parseInt(parts[7]);
+		int requestType = Integer.parseInt(parts[8]);
+		double serviceTime = Double.parseDouble(parts[9]);
+
+		return new Request(id, requestTime, new Point(pickUpPointX, pickUpPointY), new Point(dropOffX,dropOffY),
+				passengerNr, passengerState, requestType, serviceTime);
 	}
 	
 	public int getId(){
@@ -82,7 +110,5 @@ public class Request implements Comparable<Request> {
 	
 		return Double.compare(this.requestTime, request.getRequestTime());
 	}
-	
-	
 
 }
