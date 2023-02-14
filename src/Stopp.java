@@ -1,6 +1,6 @@
 import java.awt.Point;
 /**
- * Diese Klasse stelt einen Halt einer Tourenliste dar
+ * Diese Klasse stellt einen Halt einer Tourenliste dar
  * @author JS
  *
  */

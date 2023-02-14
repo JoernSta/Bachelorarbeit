@@ -148,6 +148,5 @@ public class Datengenerator {
 		}
 		return randomNumber;
 	}
-	
 
 }

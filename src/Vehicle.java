@@ -1,17 +1,12 @@
 /**
- * 
- */
-
-/**
  * @author JS
- *Klasse repräsentiert das Fahrzeug
+ * Klasse reprï¿½sentiert das Fahrzeug
  */
 
 import java.awt.Point;
 import java.util.ArrayList;
 
 public class Vehicle {
-
 	int id;
 	Point position; 
 	int capacity;
@@ -68,12 +63,7 @@ public class Vehicle {
 	}
 	
 	public boolean hasTour(){
-		int size = currentTour.size();
-		if(size == 0){
-			return false;
-		} else {
-			return true;
-		}
+		return currentTour.size() != 0;
 	}
 	
 	public void setHasTour(boolean b){
@@ -103,7 +93,7 @@ public class Vehicle {
 		vehicle.currentPassengers.remove(index);
 	}
 	
-	//gibt die Anfrage mit der eingegebenen id zurück
+	// gibt die Anfrage mit der eingegebenen id zurueck
 	public Request getSpecificRequest(int id, Vehicle vehicle, Stopp currentStopp){
 		Request specificRequest = vehicle.assignedRequests.get(0);
 		for(int i = 0; i<vehicle.assignedRequests.size();i++){
@@ -116,6 +106,7 @@ public class Vehicle {
 		return specificRequest;
 	}
 	
+
 	public int getUsedCap(){
 		return usedCap;
 	}
@@ -123,7 +114,6 @@ public class Vehicle {
 	public void setUsedCap(int i){
 		this.usedCap = i;
 	}
-	
 	
 	
 	

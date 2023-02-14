@@ -1,12 +1,8 @@
 import java.awt.Point;
 
 /**
- * 
- */
-
-/**
  * @author JS
- *Klasse repräsenttiert die Servicenafragen der Kunden
+ *Klasse repraesenttiert die Servicenafragen der Kunden
  */
 public class Request implements Comparable<Request> {
 
@@ -15,22 +11,19 @@ public class Request implements Comparable<Request> {
 	public Point pickUpPoint;
 	public Point dropOff;
 	public int passengerNr;
-	//type = 1: Kunde möchte vom Umstiegspunkt ins Stadtgebiet
-	//type = 2: Kunde möchte zur Haltestation
-	//type = 3: Kunde möchte innerhalb des Stadtgebietes transportiert werden
+	//type = 1: Kunde moechte vom Umstiegspunkt ins Stadtgebiet
+	//type = 2: Kunde moechte zur Haltestation
+	//type = 3: Kunde moechte innerhalb des Stadtgebietes transportiert werden
 	public int requestType;
 	public double serviceTime;
 	/*
 	 * state = 0: nicht zugewiesen & nicht eingesammelt
 	 * state = 1: zugewiesen aber noch nicht eingesammelt
-	 * state = 2:  zugewiesen und eingesammelt
+	 * state = 2: zugewiesen und eingesammelt
 	 * state = 3: zugewiesen und abgesetzt
 	 */
 	public int passengerState;
-	
-	
-	
-	
+
 	
 	public Request(int id, double requestTime, Point pickUp,Point delivery, int passengerNr, int state,int type, double serviceTime ) {
 		this.id = id;
@@ -41,9 +34,6 @@ public class Request implements Comparable<Request> {
 		this.passengerState = state;
 		this.requestType = type;
 		this.serviceTime = serviceTime;
-	
-		
-	
 	}
 	
 	public int getId(){

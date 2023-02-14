@@ -2,10 +2,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 /**
- * 
- */
-
-/**
  * @author JS
  *
  */
@@ -31,25 +27,24 @@ public class waitingStrategies {
 		Point currentPosition = vehicle.getPosition();
 		double arrivalTimeFromCurrentPointToTransferPoint = 0.0;
 		ArrayList<Point> reachablePoints= new ArrayList<Point>();
-		for(int i = 0; i < points.size(); i++){
-			Point currentPoint = points.get(i);
+		for (Point currentPoint : points) {
 			double distanceFromVehiclePositionToCurrentPoint = Simulation.calculateDistanceBetween2Points(currentPosition, currentPoint);
 			double driveTimeFromVehiclePositionToCurrentPoint = Simulation.calculateDriveTimeToPoint(distanceFromVehiclePositionToCurrentPoint);
 			double arrivalTimeToCurrentPoint = currentTime + driveTimeFromVehiclePositionToCurrentPoint;
-			if(vehicle.currentTour.size()==0){
+			if (vehicle.currentTour.size() == 0) {
 				double distancefromCurrentPointToTransferPoint = Simulation.calculateDistanceBetween2Points(currentPoint, transferPoint);
 				double driveTimeFromCurrentPointToTransferPoint = Simulation.calculateDriveTimeToPoint(distancefromCurrentPointToTransferPoint);
 				arrivalTimeFromCurrentPointToTransferPoint = arrivalTimeToCurrentPoint + driveTimeFromCurrentPointToTransferPoint;
-			} else{
+			} else {
 				int lastIndex = vehicle.currentTour.size() - 1;
 				Stopp lastStopp = vehicle.currentTour.get(lastIndex);
 				Point pointOfLastStopp = lastStopp.getStopp();
 				double departureTime = lastStopp.getPlannedDeaparture();
 				double distanceFromLastStoppToTransferPoint = Simulation.calculateDistanceBetween2Points(pointOfLastStopp, transferPoint);
 				double driveTimeFromLastStoppToTransferPoint = Simulation.calculateDriveTimeToPoint(distanceFromLastStoppToTransferPoint);
-				arrivalTimeFromCurrentPointToTransferPoint = departureTime + driveTimeFromLastStoppToTransferPoint;	
+				arrivalTimeFromCurrentPointToTransferPoint = departureTime + driveTimeFromLastStoppToTransferPoint;
 			}
-			if(arrivalTimeToCurrentPoint < endTime && arrivalTimeFromCurrentPointToTransferPoint <= endTime){
+			if (arrivalTimeToCurrentPoint < endTime && arrivalTimeFromCurrentPointToTransferPoint <= endTime) {
 				reachablePoints.add(currentPoint);
 			}
 		}
@@ -62,8 +57,7 @@ public class waitingStrategies {
 		int yOpt = 0;
 		int weightOfPoint = 1;
 		int overallElements = points.size();
-		for(int i = 0; i < points.size(); i++){
-			Point point = points.get(i);
+		for (Point point : points) {
 			int xOfPoint = (int) point.getX();
 			int yOfPoint = (int) point.getY();
 			xOpt = xOpt + (weightOfPoint * xOfPoint);
@@ -76,15 +70,16 @@ public class waitingStrategies {
 		return centerOfGravity;
 	}
 	
-	/**
+	/*
 	 * Methode, welche dem Wartepunkt die Position des Fahrzeuges zuweist.
 	 * @param vehicle
 	 * @return Wartepunkt
 	 */
-	public static Point waitAtCurrentPosition(Vehicle vehicle){
+
+	/* public static Point waitAtCurrentPosition(Vehicle vehicle){
 		waitingPoint = vehicle.getPosition();
 		return waitingPoint;
-	}
+	}*/
 	
 	
 

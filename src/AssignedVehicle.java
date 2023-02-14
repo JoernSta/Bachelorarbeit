@@ -1,8 +1,7 @@
 import java.util.ArrayList;
 
 public class AssignedVehicle implements Comparable<AssignedVehicle> {
-	
-	
+
 	public double waitingTime;
 	public Vehicle vehicle;
 	public ArrayList<Stopp> stopps;
