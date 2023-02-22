@@ -281,10 +281,9 @@ public class Simulation {
 	
 	public static int maxUsedCapacityOfVehicles(ArrayList<Vehicle> vehicles){
 		int maxUsedCap = 0;
-		for(int i = 0; i< vehicles.size(); i++){
-			Vehicle v = vehicles.get(i);
+		for (Vehicle v : vehicles) {
 			int usedCapOfVehicle = v.getUsedCap();
-			if(usedCapOfVehicle > maxUsedCap){
+			if (usedCapOfVehicle > maxUsedCap) {
 				maxUsedCap = usedCapOfVehicle;
 			}
 		}
@@ -294,10 +293,9 @@ public class Simulation {
 	public static int averageUsedCapacityOfVehicles(ArrayList<Vehicle> vehicles){
 		int averageUsedCap = 0;
 		int size = vehicles.size();
-		for(int i = 0; i< vehicles.size(); i++){
-			Vehicle v = vehicles.get(i);
+		for (Vehicle v : vehicles) {
 			int usedCapOfVehicle = v.getUsedCap();
-			averageUsedCap = averageUsedCap + usedCapOfVehicle; 
+			averageUsedCap = averageUsedCap + usedCapOfVehicle;
 		}
 		averageUsedCap = averageUsedCap / size;
 		return averageUsedCap;

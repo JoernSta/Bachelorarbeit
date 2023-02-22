@@ -1,6 +1,7 @@
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.lang.Math;
 
 public class Assignment {
 	
@@ -57,13 +58,13 @@ public class Assignment {
 				double distance = Simulation.calculateDistanceBetween2Points(currentPosition, pickUpPoint);
 				double driveTimeForDistance = Simulation.calculateDriveTimeToPoint(distance);
 				double arrivalTimeAtPickUpPoint = currentTime + driveTimeForDistance;
-				// Wenn die Ankunftszeit ≤ der Servicezeit ist, dann setze die Wartezeit des Kunden auf 0.0.
+				// Wenn die Ankunftszeit kleiner oder gleich der Servicezeit ist, dann setze die Wartezeit des Kunden auf 0.0.
 				if (arrivalTimeAtPickUpPoint <= serviceTime) {
 					waitingTime = 0.0;
 					int stoppType = 2;
 					System.out.println(requestId);
 					Stopp pickUpStopp = new Stopp(requestId, pickUpPoint, serviceTime, stoppType, serviceTime, lastArrivalTime, passengers, 0, serviceTime, serviceType);
-					//RequestId und RequestType wurden nicht richtig gespeichert.
+					// RequestId und RequestType wurden nicht richtig gespeichert.
 					pickUpStopp.setRequestId(requestId);
 					pickUpStopp.setRequestType(serviceType);
 					tour.add(pickUpStopp);
@@ -76,29 +77,28 @@ public class Assignment {
 					vehicleForAssigning.add(potentialVehicle);
 
 					System.out.println("Assigningliste nach Einfuegen:" + vehicleForAssigning.size());
-					//Wenn die Ankunftszeit groesser der Servicezeit, ueberpruefe, ob diese die maximal erlaubte Wartezeit einhaelt.
-				} else {
-					boolean checkingWaitingTime = checkWaitingTime(arrivalTimeAtPickUpPoint, lastArrivalTime);
-					if (checkingWaitingTime) {
-						waitingTime = arrivalTimeAtPickUpPoint - serviceTime;
-						System.out.println(requestId);
-						Stopp pickUpStopp = new Stopp(requestId, pickUpPoint, arrivalTimeAtPickUpPoint, 1, arrivalTimeAtPickUpPoint, lastArrivalTime, passengers, 0, serviceTime, 1);
-						pickUpStopp.setRequestId(requestId);
-						pickUpStopp.setRequestType(serviceType);
-						tour.add(pickUpStopp);
-						Stopp dropOffStopp = createDropOffStopp(dropOffPoint, maxDrivingTime, currentRequest);
-						dropOffStopp.setRequestId(requestId);
-						dropOffStopp.setRequestType(serviceType);
-						dropOffStopp.setServiceTime(serviceTime);
-						tour.add(dropOffStopp);
+					// Wenn die Ankunftszeit groesser der Servicezeit, ueberpruefe, ob diese die maximal erlaubte Wartezeit einhaelt.
+				} else if (arrivalTimeAtPickUpPoint <= lastArrivalTime) {
+					waitingTime = arrivalTimeAtPickUpPoint - serviceTime;
+					System.out.println(requestId);
+					Stopp pickUpStopp = new Stopp(requestId, pickUpPoint, arrivalTimeAtPickUpPoint, 1, arrivalTimeAtPickUpPoint, lastArrivalTime, passengers, 0, serviceTime, 1);
+					pickUpStopp.setRequestId(requestId);
+					pickUpStopp.setRequestType(serviceType);
+					tour.add(pickUpStopp);
+					Stopp dropOffStopp = createDropOffStopp(dropOffPoint, maxDrivingTime, currentRequest);
+					dropOffStopp.setRequestId(requestId);
+					dropOffStopp.setRequestType(serviceType);
+					dropOffStopp.setServiceTime(serviceTime);
+					tour.add(dropOffStopp);
 
-						AssignedVehicle potentialVehicle = new AssignedVehicle(vehicle, tour, waitingTime);
-						vehicleForAssigning.add(potentialVehicle);
-					}
+					AssignedVehicle potentialVehicle = new AssignedVehicle(vehicle, tour, waitingTime);
+					vehicleForAssigning.add(potentialVehicle);
+				} else {
+					System.out.println("Fahrzeug nicht rechtzeitig am Stopp");
 				}
-			}
-			//Wenn die Tour bereits Punkte enthaelt, dann ueberpruefe drei moegliche Faelle
-			if (tourSize > 0) {
+			} else {
+				//Wenn die Tour bereits Punkte enthaelt, dann ueberpruefe drei moegliche Faelle
+
 				//Fall 1: die serviceTime ist kleiner als die serviceTime der bisherigen Pick-up Points in der Tour und Fuege den Punkt vorne an und den drop-Off Point dahinter.
 				//Fall 2: die ServiceTime ist groesser als die bisherigen	Pick-Up-Points --> Fuege Punkt hinten an der Liste ein.
 				//Fall 3: Die serviceTime ist gleich der schon bisherigen Pick-Up-Points --> Fuege den Pick-Up Point an der letzten Stelle der Pick-Up Points ein, wo die gleiche Servicezeit ist.
@@ -107,25 +107,54 @@ public class Assignment {
 				int indexOfPickUpPoint = 0;
 				int indexOfDropOffPoint = 0;
 				int swapCounter = 0;
+
 				//Bestimme den Indexpunkt, wo der Pick-Up-Point eingefuegt werden soll.
 				//Gehe dabei alle aktuellen Stopps der Tour durch.
 				for (Stopp stopp : tour) {
 					double serviceTimeOfCurrentStopp = stopp.getServiceTime();
 					int stoppType = stopp.getType();
 					int requestType = stopp.getRequestType();
-					//Wenn die Servicezeit < der Servicezeit des aktuell betrachteten Stopps ist und dieser auch ein Pick-Up-Point ist, dann verringere den Index um eine Stelle.
-					if (requestType != 1) {
-						indexOfPickUpPoint = indexOfPickUpPoint + 1;
-					} else if (serviceTime > serviceTimeOfCurrentStopp) {
-						indexOfPickUpPoint = indexOfPickUpPoint + 1;
 
+					//Wenn die Servicezeit < der Servicezeit des aktuell betrachteten Stopps ist und dieser auch ein Pick-Up-Point ist, dann verringere den Index um eine Stelle.
+					if (requestType != 1 || serviceTime > serviceTimeOfCurrentStopp) {
+						// skip
 					} else if (serviceTime == serviceTimeOfCurrentStopp && stoppType == 2) {
-						indexOfPickUpPoint = indexOfPickUpPoint + 1;
 						swapCounter = swapCounter + 1;
+					} else {
+						break;
 					}
+					indexOfPickUpPoint = indexOfPickUpPoint + 1;
 				}
+
 				//ueberpruefe, ob der zuvor festgelegte Punkt kleiner als null ist, wenn ja, dann fuege den Pick-Up-Point und den DropOff-Point an den Anfang der Tour ein.
-				if (indexOfPickUpPoint >= tour.size()) {
+				if (indexOfPickUpPoint < tour.size()) {
+					indexOfDropOffPoint = indexOfPickUpPoint + 1;
+					Stopp pickUpStopp;
+					if (indexOfPickUpPoint == 0) {
+						Point currentPosition = vehicle.getPosition();
+						double distance = Simulation.calculateDistanceBetween2Points(currentPosition, pickUpPoint);
+						double driveTimeForDistance = Simulation.calculateDriveTimeToPoint(distance);
+						double arrivalTimeAtPickUpPoint = currentTime + driveTimeForDistance;
+						waitingTime = Math.max(arrivalTimeAtPickUpPoint - serviceTime, 0.0);
+						pickUpStopp = new Stopp(requestId, pickUpPoint, serviceTime, 2, serviceTime, lastArrivalTime, passengers, 0, serviceTime, serviceType);
+					} else {
+						pickUpStopp = new Stopp(requestId, pickUpPoint, 0.0, 2, 0.0, 0.0, passengers, 0, serviceTime, serviceType);
+					}
+					tour.add(indexOfPickUpPoint, pickUpStopp);
+
+					Stopp dropOffStopp = new Stopp(requestId, dropOffPoint, 0.0, 3, 0.0, 0.0, passengers, 0, serviceTime, serviceType);
+					tour.add(indexOfDropOffPoint, dropOffStopp);
+
+					calculateTimesOfTour(tour, maxWaitingTime, maxDrivingTime);
+					double waitingTime = calculateWaitingTimeOfTour(tour, maxWaitingTime);
+					AssignedVehicle potentialVehicle = new AssignedVehicle(vehicle, tour, waitingTime);
+					vehicleForAssigning.add(potentialVehicle);
+
+					if (swapCounter > 0) {
+						int swapIndex = (indexOfDropOffPoint + indexOfPickUpPoint) - 1;
+						swapPointsInTour(indexOfDropOffPoint, swapIndex, tour, vehicle, vehicleForAssigning, maxWaitingTime, maxDrivingTime);
+					}
+				} else {
 					//0.0 sind Platzhalter, die die genauen Werte werden noch berechnet.
 					Stopp pickUpStopp = new Stopp(requestId, pickUpPoint, 0.0, 2, 0.0, 0.0, passengers, 0, serviceTime, 1);
 					//Fehler bei Id und serviceTime
@@ -142,42 +171,6 @@ public class Assignment {
 					double waitingTime = calculateWaitingTimeOfTour(tour, maxWaitingTime);
 					AssignedVehicle potentialVehicle = new AssignedVehicle(vehicle, tour, waitingTime);
 					vehicleForAssigning.add(potentialVehicle);
-				} else {
-					indexOfDropOffPoint = indexOfPickUpPoint + 1;
-					if (indexOfPickUpPoint == 0) {
-						Point currentPosition = vehicle.getPosition();
-						double distance = Simulation.calculateDistanceBetween2Points(currentPosition, pickUpPoint);
-						double driveTimeForDistance = Simulation.calculateDriveTimeToPoint(distance);
-						double arrivalTimeAtPickUpPoint = currentTime + driveTimeForDistance;
-						waitingTime = 0.0;
-						int stoppType = 2;
-						Stopp pickUpStopp = new Stopp(requestId, pickUpPoint, serviceTime, stoppType, serviceTime, lastArrivalTime, passengers, 0, serviceTime, serviceType);
-						pickUpStopp.setRequestId(requestId);
-						pickUpStopp.setRequestType(serviceType);
-						tour.add(indexOfPickUpPoint, pickUpStopp);
-
-					} else {
-						Stopp pickUpStopp = new Stopp(requestId, pickUpPoint, 0.0, 2, 0.0, 0.0, passengers, 0, serviceTime, 1);
-						//Fehler bei Id und serviceTime
-						pickUpStopp.setRequestId(requestId);
-						pickUpStopp.setRequestType(serviceType);
-						tour.add(indexOfPickUpPoint, pickUpStopp);
-					}
-					Stopp dropOffStopp = new Stopp(requestId, dropOffPoint, 0.0, 3, 0.0, 0.0, passengers, 0, serviceTime, 1);
-					dropOffStopp.setRequestId(requestId);
-					dropOffStopp.setRequestType(serviceType);
-					dropOffStopp.setServiceTime(serviceTime);
-					tour.add(indexOfDropOffPoint, dropOffStopp);
-					calculateTimesOfTour(tour, maxWaitingTime, maxDrivingTime);
-					double waitingTime = calculateWaitingTimeOfTour(tour, maxWaitingTime);
-					AssignedVehicle potentialVehicle = new AssignedVehicle(vehicle, tour, waitingTime);
-					vehicleForAssigning.add(potentialVehicle);
-
-					if (swapCounter > 0) {
-						int startSwapIndex = indexOfDropOffPoint;
-						int swapIndex = (indexOfDropOffPoint + indexOfPickUpPoint) - 1;
-						swapPointsInTour(startSwapIndex, swapIndex, tour, vehicle, vehicleForAssigning, maxWaitingTime, maxDrivingTime);
-					}
 				}
 			}
 			/*

@@ -37,7 +37,7 @@ public class Stopp {
 		this.passengers = passengers;
 		this.maxMovedPosition = maxSwap;
 		this.serviceTime = service;
-		this.requestId = requestType;
+		this.requestType = requestType;
 	}
 	
 	public int getRequestId(){
