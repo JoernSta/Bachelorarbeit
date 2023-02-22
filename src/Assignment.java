@@ -42,7 +42,7 @@ public class Assignment {
 			
 		
 		//Die Liste Vehicles kopieren/clonen.
-		//Gehe Liste der Fahrzeuge durch, nutze dafï¿½r eine Kopie der originalen Liste.
+		//Gehe Liste der Fahrzeuge durch, nutze dafuer eine Kopie der originalen Liste.
 		for (Vehicle vehicle : vehicles) {
 			ArrayList<Stopp> tourOfCurrentVehicle = vehicle.currentTour;
 			System.out.println("FahrzeugId:" + "" + vehicle.getId() + "Tourengroesse des Fahrzeuges" + tourOfCurrentVehicle.size());
@@ -235,7 +235,7 @@ public class Assignment {
 				double arrivalTimeToDropOff = arrivalTime + driveTimeToDropOffPoint;
 				double departureTime = 0.0;
 				double latestDeparture = 0.0;
-				//Wenn die geplante Ankunft am DropOff Punkt kleiner als der fruehestmoegliche Zeitpunkt ist, dann erhï¿½he die Abfahrt von dem Pick-Up Punkt um die Zeitdifferenz.
+				//Wenn die geplante Ankunft am DropOff Punkt kleiner als der fruehestmoegliche Zeitpunkt ist, dann erhoehe die Abfahrt von dem Pick-Up Punkt um die Zeitdifferenz.
 				if (arrivalTimeToDropOff < earliestArrivalTimeAtDropOff) {
 					double timeDifference = earliestArrivalTimeAtDropOff - arrivalTimeToDropOff;
 					departureTime = arrivalTime + timeDifference;
@@ -311,7 +311,7 @@ public class Assignment {
 						double arrivalTimeToDropOff = arrivalTime + driveTimeToDropOffPoint;
 						double departureTime = 0.0;
 						double latestDeparture = 0.0;
-						//Wenn die geplante Ankunft am DropOff Punkt kleiner als der fruehestmoegliche Zeitpunkt ist, dann erhï¿½he die Abfahrt von dem Pick-Up Punkt um die Zeitdifferenz.
+						//Wenn die geplante Ankunft am DropOff Punkt kleiner als der fruehestmoegliche Zeitpunkt ist, dann erhoehe die Abfahrt von dem Pick-Up Punkt um die Zeitdifferenz.
 						if (arrivalTimeToDropOff < earliestArrivalTimeAtDropOff) {
 							double timeDifference = earliestArrivalTimeAtDropOff - arrivalTimeToDropOff;
 							departureTime = arrivalTime + timeDifference;
@@ -374,7 +374,7 @@ public class Assignment {
 		
 	
 	/**
-	 * Diese Methode überprüft ob die Wartezeit des Kunden die maximale Wartezeit nicht überschreitet.
+	 * Diese Methode überprüft, ob die Wartezeit des Kunden die maximale Wartezeit nicht überschreitet.
 	 * @param time1, Wartezeit der Kunden.
 	 * @param time2, maximaleWartezeit
 	 * @return
@@ -384,12 +384,12 @@ public class Assignment {
 	}
 	/**
 	 * Diese Methode ueberprueft eine Tour des Fahrzeugs, ob die Kapazitaetsrestriktion eingehalten wird.
-	 * Wenn es sich um einen Pick-Up Punkt handelt, wird die aktuelle Kapazitaet um die anzahl an Passagieren erhï¿½ht.
+	 * Wenn es sich um einen Pick-Up Punkt handelt, wird die aktuelle Kapazitaet um die anzahl an Passagieren erhoeht.
 	 * Wenn es sich um einen Drop-Off Punkt handelt, wird die aktuelle Kapazitaet um die Anzahl verringert.
 	 * @param vehicle das zu ueberpruefende Fahrzeug
 	 * @param tour die zum Fahrzeug zugehoerige Tour, welche ueberprueft werden soll
 	 * @param maxCapacity, die maximale Kapazitaet der Fahrzeuge
-	 * @return einen Boolean, der entweder true ist, falls die maximale Kapazitaet des Fahrzeuges nicht Ã¼berschritten wird oder false, falls die Kapazitaet ueberschritten wird
+	 * @return einen Boolean, der entweder true ist, falls die maximale Kapazitaet des Fahrzeuges nicht ueberschritten wird oder false, falls die Kapazitaet ueberschritten wird
 	 */
 	public static boolean checkCapacity(Vehicle vehicle, ArrayList<Stopp> tour, int maxCapacity){
 		boolean checkCapacity = true;
@@ -638,7 +638,7 @@ public class Assignment {
 				double driveTimeToDropOffPoint = Simulation.calculateDriveTimeToPoint(distanceToDropOffPoint);
 				double arrivalTimeToDropOff = arrivalTimeAtCurrentStopp + driveTimeToDropOffPoint;
 				double earliestArrivalTimeAtDropOff = serviceTimeOfCurrentStopp - maxWaitingTime;
-				//Wenn die geplante Ankunft am DropOff Punkt kleiner ist, als der fruehestmoegliche Zeitpunkt ist, dann erhï¿½he die geplante Ankunft/Abfahrt von dem Pick-Up Punkt um die Zeitdifferenz von der frühstmöglichen Ankuft minus der Fahrzeit.
+				//Wenn die geplante Ankunft am DropOff Punkt kleiner ist, als der fruehestmoegliche Zeitpunkt ist, dann erhoehe die geplante Ankunft/Abfahrt von dem Pick-Up Punkt um die Zeitdifferenz von der fruehstmoeglichen Ankunft minus der Fahrzeit.
 				if(arrivalTimeToDropOff < earliestArrivalTimeAtDropOff){
 					double timeDifference = earliestArrivalTimeAtDropOff - arrivalTimeToDropOff;
 					double departureTime = earliestArrivalTimeAtDropOff - driveTimeToDropOffPoint;
@@ -648,7 +648,7 @@ public class Assignment {
 					currentStopp.setLatestArrivalTime(latestDeparture);
 					System.out.println("Zeitunterschied" + timeDifference);
 					System.out.println("Fahrzeit:" + driveTimeToDropOffPoint);
-					System.out.println("Frühstmögliche Ankunft am dropofftime:" + earliestArrivalTimeAtDropOff);
+					System.out.println("Fruehstmoegliche Ankunft am dropofftime:" + earliestArrivalTimeAtDropOff);
 				} else{
 					double departureTime = arrivalTimeAtCurrentStopp;
 					double timeDifference = serviceTimeOfCurrentStopp - arrivalTimeToDropOff;

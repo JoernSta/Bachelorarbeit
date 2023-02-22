@@ -41,8 +41,8 @@ public class waitingStrategies {
 			double driveTimeFromVehiclePositionToCurrentPoint = Simulation.calculateDriveTimeToPoint(distanceFromVehiclePositionToCurrentPoint);
 			double arrivalTimeToCurrentPoint = currentTime + driveTimeFromVehiclePositionToCurrentPoint;
 			if (vehicle.currentTour.size() == 0) {
-				double distancefromCurrentPointToPoint = Simulation.calculateDistanceBetween2Points(currentPoint, targetPoint);
-				double driveTimeFromCurrentPointToPoint = Simulation.calculateDriveTimeToPoint(distancefromCurrentPointToPoint);
+				double distanceFromCurrentPointToPoint = Simulation.calculateDistanceBetween2Points(currentPoint, targetPoint);
+				double driveTimeFromCurrentPointToPoint = Simulation.calculateDriveTimeToPoint(distanceFromCurrentPointToPoint);
 				double arrivalTimeFromCurrentPointToTransferPoint = arrivalTimeToCurrentPoint + driveTimeFromCurrentPointToPoint;
 				if (arrivalTimeFromCurrentPointToTransferPoint <= endTime) {
 					reachablePoints.add(currentPoint);

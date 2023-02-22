@@ -110,7 +110,7 @@ public class Simulation {
 	 }
 	
 	/**
-	 * Methode zur Bestimmung der Distanz zwischen zwei Punkten
+	 * Methode zur Bestimmung der Distanz zwischen zwei Punkten.
 	 * Die Distanzen werden euklidisch bestimmt.
 	 * @param p1 Punkt 1 der zur Berechnung benoetigt wird
 	 * @param p2 Punkt 2, der zur Berechnung benoetigt wird
@@ -194,7 +194,7 @@ public class Simulation {
 	 * @param maxWaitingTime, maximal erlaubte Wartezeit der Kunden zur Bedienung
 	 * @param maxDrivingTime maximale Fahrzeit der Insassen.
 	 * @param maxCapacity maximale Kapazität der Fahrzeuge
-	 * @param maxMovingPosition, maximale Verschiebung der Kunden(wurde allerdings noch nicht implementiert)
+	 * @param maxMovingPosition, maximale Verschiebung der Kunden (wurde allerdings noch nicht implementiert)
 	 */
 	public static void startSimulation(int waitingStrategy,double startTime, double endTime,  ArrayList<Request> requests, ArrayList<Vehicle> vehicles,double maxWaitingTime,double maxDrivingTime,int maxCapacity,int maxMovingPosition){
 		waitingTimesOfCustomers = new ArrayList<Times>();

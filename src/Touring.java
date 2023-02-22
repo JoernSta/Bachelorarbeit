@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * Diese Klasse regelt das Touring, falls keine Anfrage zu zugewiesen werden muss oder ruft die Zuweisungd der Fahrzeuge auf.
+ * Diese Klasse regelt das Touring, falls keine Anfrage zu zugewiesen werden muss oder ruft die Zuweisung der Fahrzeuge auf.
  * @author JS
  *
  */
@@ -110,7 +110,7 @@ public class Touring {
 	 * @param maxWaitingTime die maximal erlaubte Wartezeit
 	 * @param maxDrivingTime maximale Fahrzeit der Fahrgäste
 	 * @param maxCapacity maximale Kapazität der Fahrzeuge
-	 * @param maxMovingPosition maximal nach hinten verschobene Personen (noch nicht implemnetiert)
+	 * @param maxMovingPosition maximal nach hinten verschobene Personen (noch nicht implementiert)
 	 * @param waitingTimesOfCustomers Wartezeiten der einzelnen Kunden
 	 * @param points Punkte des Servicegebiets
 	 * @param transferPoint Umsteigepunkt
@@ -148,7 +148,7 @@ public class Touring {
 							Stopp stopp = new Stopp(0, waitingPoint, arrivalTimeToWaitingPoint, 1, arrivalTimeToWaitingPoint, arrivalTimeToWaitingPoint, 0, 0, 0.0, 0);
 							vehicle.currentTour.add(stopp);
 						}
-						// hat das Fahrzeug eine Tour, so soll die Tour solange bearbeitet werden, bis die neue Anfrage eintrifft.
+						// hat das Fahrzeug eine Tour, so soll die Tour so lange bearbeitet werden, bis die neue Anfrage eintrifft.
 					} else {
 						for (int h = 0; h < vehicle.currentTour.size(); h++){
 							Stopp currentStopp = vehicle.currentTour.get(h);
@@ -168,12 +168,12 @@ public class Touring {
 								nextStopp.setArrivalTime(arrivalTimeAtNextStop);
 								//
 							
-								//Berechne Fahrt zu Punkt, so dass wir die späteste Abfahrt und die Servicezeit zu dem nächsten Punkt haben.
+								// Berechne Fahrt zu Punkt, sodass wir die späteste Abfahrt und die Servicezeit zu dem nächsten Punkt haben.
 						
 							}
 							double servingTime = currentStopp.getPlannedDeaparture();
 							double arrivalTime = currentStopp.getArrivalTime();
-							//Wir fügen einen Warteort ein, wenn wir ein Zeitpuffer haben, dieser ergibt sich aus der Ankunftszeit des Knoten und Zeit der Kundenbedienung(servingTime)
+							//Wir fügen einen Warteort ein, wenn wir einen Zeitpuffer haben, dieser ergibt sich aus der Ankunftszeit des Knotens und Zeit der Kundenbedienung(servingTime)
 							
 							if(servingTime > arrivalTime && stoppType != 1 && arrivalTime <= requestTime){
 								printTour(vehicle);
@@ -197,14 +197,14 @@ public class Touring {
 									if(departureTimeFromWaitingPoint <= requestTime){
 										Simulation.setCurrentTime(departureTimeFromWaitingPoint);
 										vehicle.currentTour.remove(waitingStopp);
-										//Wartepunkt muss gelöscht werden, bei h-1 und
-										//Der Punkt muss gelöscht werden.
+										// Wartepunkt muss gelöscht werden, bei h-1 und
+										// der Punkt muss gelöscht werden.
 										h = -1;
 									
 									}
 								}
 								printTour(vehicle);
-								System.out.println("Tourengröße:" + vehicle.currentTour.size());
+								System.out.println("Tourengroeße:" + vehicle.currentTour.size());
 							}
 				
 							if (servingTime >= currentTime && servingTime <= requestTime) {
@@ -430,8 +430,8 @@ public class Touring {
 		}
 	}
 	/**
-	 * Diese Methode setzt die Ankunftszeit,Abfahrtszeit, und die latestAbfahrtszeit. CenterOfGravity
-	 * Dabei wird über die FahrzeugTour iteriert und wenn wir einen Wartpunkt finden, dann erstellen wir ausgehend von unserer aktuellen Position des Fahrzeugs die Ankunftszeiten
+	 * Diese Methode setzt die Ankunftszeit, Abfahrtszeit und die latestAbfahrtszeit. CenterOfGravity.
+	 * Dabei wird über die FahrzeugTour iteriert und wenn wir einen Wartepunkt finden, dann erstellen wir ausgehend von unserer aktuellen Position des Fahrzeugs die Ankunftszeiten
 	 * und die Abfahrtszeit entspricht der Zeit, wann das Fahrzeug abfahren muss, um beim nächsten Kunden pünktlich zu sein.
 	 * @param vehicle
 	 * @param currentTime
@@ -447,8 +447,8 @@ public class Touring {
 		Stopp nextStopp = vehicle.currentTour.get(0);
 		Point nextPoint = nextStopp.getStopp();
 		double servingTimeFromNextStopp = nextStopp.getPlannedDeaparture();
-		double distanceFromstoppPointToNextPoint = Simulation.calculateDistanceBetween2Points(stoppPoint, nextPoint);
-		double driveTimeFromStoppPointToNextPoint = Simulation.calculateDriveTimeToPoint(distanceFromstoppPointToNextPoint);
+		double distanceFromStoppPointToNextPoint = Simulation.calculateDistanceBetween2Points(stoppPoint, nextPoint);
+		double driveTimeFromStoppPointToNextPoint = Simulation.calculateDriveTimeToPoint(distanceFromStoppPointToNextPoint);
 		double departureTime = servingTimeFromNextStopp - driveTimeFromStoppPointToNextPoint;
 		waitingStopp.setArrivalTime(arrivalTime);
 		waitingStopp.setPlannedDeparture(departureTime);
@@ -469,7 +469,7 @@ public class Touring {
 			Point point = stopp.getStopp();
 			double arrival = stopp.getArrivalTime();
 			double departure = stopp.getPlannedDeaparture();
-			System.out.println("FahrzuegId:" + vehicle.getId() + " " + "Tour:" + " " + id + " " + point + " " + arrival + " " + departure);
+			System.out.println("FahrzeugId:" + vehicle.getId() + " " + "Tour:" + " " + id + " " + point + " " + arrival + " " + departure);
 		}
 	}
 	

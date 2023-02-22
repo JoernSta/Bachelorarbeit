@@ -4,7 +4,8 @@
 
 /**
  * @author JS
- *Diese Klasse dient zur Berechnung der durchschnittlichen Fahrzeiten.
+ *
+ * Diese Klasse dient zur Berechnung der durchschnittlichen Fahrzeiten.
  *
  */
 public class DriveTimesOfCustomers {
@@ -33,8 +34,8 @@ public class DriveTimesOfCustomers {
 		return pickUpTime;
 	}
 	/**
-	 * Diese Methode  setzt pickUptime.
-	 * @param t, die Zeit auf die die PickUpTime gesetzt werden soll.
+	 * Diese Methode setzt pickUptime.
+	 * @param t, die Zeit, auf die die PickUpTime gesetzt werden soll.
 	 */
 	public void setPickUpTime(double t){
 		this.pickUpTime = t;
@@ -43,13 +44,12 @@ public class DriveTimesOfCustomers {
 	 * Diese Methode gibt die dropOffTime einer Anfrage zurück.
 	 * @return
 	 */
-	public double getdropOffTime(){
+	public double getDropOffTime(){
 		return dropOffTime;
 	}
 	
 	public void setDropOffTime(double t){
 		this.dropOffTime = t;
 	}
-	
 
 }

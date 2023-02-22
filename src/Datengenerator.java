@@ -68,7 +68,7 @@ public class Datengenerator {
 			int randomDropX = random.nextInt(5);
 			int randomDropY = createRandomNumber(1,6);
 			Point dropOff = new Point(randomDropX,randomDropY);
-			//Spaetester Zeitpunkt beträgt eine Stunde nach Anfragenstelllung.
+			// Spaetester Zeitpunkt beträgt eine Stunde nach Anfragenstelllung.
 			double lateWindow = randomRequestTime + 1.0;
 			double window = random.nextDouble() * (lateWindow - randomRequestTime) + randomRequestTime;
 			//Gehe die Abfahrtszeiten am Umsteigepunkt durch
