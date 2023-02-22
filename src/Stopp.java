@@ -114,5 +114,6 @@ public class Stopp {
 	public void setRequestType(int i){
 		this.requestType = i;
 	}
+	
 
 }

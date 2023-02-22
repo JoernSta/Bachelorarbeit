@@ -14,23 +14,27 @@ public class Simulation {
 	
 	public static double startTime = 8.0;
 	public static double endTime = 18.0;
-	public static double lastFeasibleRequestTime = 17.25;
+	public static double lastFeasibleRequestTime = 17.5;
 	public static double currentTime;
+	//sechs Minuten 0.08
+	//15 Minuten 0.25
 	static double maxWaitingTime = 0.25;
 	static double maxDrivingTime = 0.5;
 	static ArrayList<Request> allRequests;
 	static ArrayList<Vehicle> allVehicles;
 	static ArrayList<Times> waitingTimesOfRequests;
+	static ArrayList<DriveTimesOfCustomers> driveTimesOfCustomers;
 	static int capacity = 6;
 	public static int countVehicle = 2;
 	public static int countRequests = 8;
-	public static int typeOneRequests = 50;
-	public static int typeTwoRequests = 50;
-	static int speed = 50;
+	public static int typeOneRequests = 40;
+	public static int typeTwoRequests = 40;
+	static int speed = 30;
 	static Point waitingPoint;
 	static Point startPoint = new Point(0,2);
 	public static int maxMovingPosition = 3;
 	public static ArrayList<Times> waitingTimesOfCustomers;
+	// nicht für die BA relevant
 	public static int waitingStrategyAtCurrentPosition = 0;
 	public static int waitingStrategyCenterOfGravity = 1;
 	public static int waitingStrategyDriveFirst = 2;
@@ -94,21 +98,20 @@ public class Simulation {
 	  * @param s = die Geschwindigkeit der Fahrzeuge
 	  */
 	 public static void createVehicles(int a, int s){
-		 startPoint = new Point(0,2);
-		 ArrayList <Request> assignedRequest = new ArrayList<>();
-		 ArrayList <Request> curPassengers = new ArrayList<>();
+		 startPoint = new Point(2,0);
 		 ArrayList <Stopp> curTour = new ArrayList<>();
 		 allVehicles = new ArrayList<>();
 		 int usedCap = 0;
 		 for(int i = 0; i<a; i++){
 			 int id = i+1;
-			 Vehicle vehicle = new Vehicle(id,startPoint,0,s,assignedRequest,curPassengers,curTour,usedCap);
+			 Vehicle vehicle = new Vehicle(id,startPoint,0,s,curTour,usedCap);
 			 allVehicles.add(vehicle);
 		 }
 	 }
 	
 	/**
 	 * Methode zur Bestimmung der Distanz zwischen zwei Punkten
+	 * Die Distanzen werden euklidisch bestimmt.
 	 * @param p1 Punkt 1 der zur Berechnung benoetigt wird
 	 * @param p2 Punkt 2, der zur Berechnung benoetigt wird
 	 * @return die berechnete Distanz in km
@@ -127,173 +130,7 @@ public class Simulation {
 	}
 
 
-	/*
-	 * Diese Methode ist veraltet, hier sollte die Zuweisung erfolgen. Wird nun aber in der Klasse Assignment vorgenommen
-	 * @param currentRequest, derzeitige Serviceanfrage
-	 * @param vehicleList, Liste aller Fahrzeuge
-	 */
-	/*public static void assignRequestToVehicle(Request currentRequest, ArrayList<Vehicle> vehicleList){
-		int id = currentRequest.getId();
-		System.out.println("Weise Kundenanfrage" + " " + id + " " +  "ein Fahrzeug zu!");
-		double curReqTime = currentRequest.getRequestTime();
-		Point reqPickUpPoint = currentRequest.getPickUpPoint();
-		Point reqDeliveryPoint = currentRequest.getDropOffPoint();
-		Point posVehicle;
-		double arrivalTimeOfLastStopp;
-		double arrivalTimeToPickUpPoint;
-		int assignedVehicle = 0;
-		double[] arrivalTimes = new double[vehicleList.size()];
-		
-		for(int i = 0; i<vehicleList.size(); i++){
-			Vehicle vehicle = vehicleList.get(i);
-			//Checke, ob Fahrzeug aktuelle Tour besitzt und passe jeweils arrivalTimeOfLastStopp an 
-			int tourSize = vehicle.currentTour.size();
-			if(tourSize ==0){
-			posVehicle = vehicle.getPosition();
-			arrivalTimeOfLastStopp = currentTime;
-			} else {
-			Stopp lastStoppOfCurrentTour = vehicle.currentTour.get(tourSize-1);
-			posVehicle = lastStoppOfCurrentTour.getStopp();
-			arrivalTimeOfLastStopp = lastStoppOfCurrentTour.getArrivalTime();
-			}
-			//Berechnung der Distanz und Fahrzeit
-			double distanceToPickUpPoint = calculateDistanceBetween2Points(posVehicle, reqPickUpPoint);
-			double driveTimeToPickUpPoint = calculateDriveTimeToPoint(distanceToPickUpPoint);
-			//Berechnung der Ankunftszeit:
-			arrivalTimeToPickUpPoint = arrivalTimeOfLastStopp + driveTimeToPickUpPoint;
-			//Ankunftszeiten werden in Array gespeichert
-			arrivalTimes[i] = arrivalTimeToPickUpPoint;
-			System.out.println("Fahrzeug" + i+1 + " " + "hat eine Ankunftszeit" + " " + arrivalTimes[i]);
-		}
-		//Die niedrigsteArrivalTime wird bestimmt
-		double minArrivalTime = arrivalTimes[0];
-		for(int j =0; j<arrivalTimes.length; j++){
-			if(arrivalTimes[j] < minArrivalTime){
-				assignedVehicle = j;
-			}
-		}
-		Vehicle choosenVehicle = vehicleList.get(assignedVehicle);
-		int vehicleId = choosenVehicle.getId();
-		double minArrivalTimeToPickUpPoint = arrivalTimes[assignedVehicle];
-		Stopp pickUpStopp = new Stopp(id, reqPickUpPoint, minArrivalTimeToPickUpPoint,2);
-		double distanceToDeliveryPoint = calculateDistanceBetween2Points(reqPickUpPoint, reqDeliveryPoint);
-		double driveTimeToDeliveryPoint = calculateDriveTimeToPoint(distanceToDeliveryPoint);
-		double arrivalTimeToDeliveryPoint1 = minArrivalTimeToPickUpPoint + driveTimeToDeliveryPoint;
-		Stopp deliveryStopp = new Stopp(id, reqDeliveryPoint, arrivalTimeToDeliveryPoint1,3);
-		choosenVehicle.currentTour.add(pickUpStopp);
-		choosenVehicle.currentTour.add(deliveryStopp);
-		double waitingTimeOfRequest =  minArrivalTimeToPickUpPoint;
-		System.out.println("Kundenanfrage:" + " " + currentRequest.getId() + " " + "wurde Fahrzeug:" + " " + vehicleId + " " + "zugewiesen!");
-		System.out.println("Wartezeit" + " " +"der" + " " + "Kundenanfrage" + currentRequest.getId() + ":" + " " + waitingTimeOfRequest);
-	}*/
 	
-
-	/*
-	 * Diese Methode startet die Simulation, allerdings veraltet, da Sachen ausgelagert werden
-	 * @param requests, Liste aller Serviceanfragen
-	 * @param vehicles, Liste aller Fahrzeuge
-	 */
-	/*public static  void flowSimulation(ArrayList<Request> requests, ArrayList<Vehicle> vehicles){
-		setCurrentTime(startTime);
-		Point wP = new Point(1,1);
-		setWaitingPoint(wP);
-		waitingPoint = getWaitingPoint();
-		currentTime = getCurrentTime();
-		for (int i = 0; i< requests.size(); i++){
-			Request request = requests.get(i);
-			double requestTime = request.getRequestTime();
-			// Verhalten des Fahrzeuges bis eine neue Anfrage reinkommt
-			while(requestTime > currentTime){
-				for (int j = 0; j< vehicles.size(); j++){
-					Vehicle vehicle = vehicles.get(j);
-					//Wenn Fahrzeug keine aktuelle Tour besitzt: 
-					if(vehicle.currentTour.size() == 0){
-						Point vehPos = vehicle.getPosition();
-						Point waitPoint = getWaitingPoint();
-						double distance = calculateDistanceBetween2Points(vehPos, waitPoint);
-						double timeToPoint = calculateDriveTimeToPoint(distance);
-						double arrival = currentTime + timeToPoint;
-						Stopp stopp = new Stopp(0, waitPoint, arrival, 1);
-						vehicle.currentTour.add(stopp);
-						System.out.println("Wartepunkt wurde der Tour hinzugefuegt!");
-						//Verhalten, falls das Fahrzeug eine Tour besitzt.
-					} else {
-						System.out.println("Fahrzeug" + " " + vehicle.getId() + " " + "hat noch eine Tour");
-						for(int k= 0; k < vehicle.currentTour.size(); k++){
-							Stopp tourStopp = vehicle.currentTour.get(0);
-							System.out.println(tourStopp.getStopp() + " " + tourStopp.getArrivalTime());
-							double tourTime = tourStopp.getArrivalTime();
-							//P1 = 8.0 request 8.30
-							if(tourTime < requestTime){
-								Point tourPoint = tourStopp.getStopp();
-								vehicle.setPosition(tourPoint);
-								// Der Typ sagt dann eine Aktion an: entweder Warten, einsammeln oder absetzen
-								int stoppType = tourStopp.getType();
-								if(stoppType == 1){
-									System.out.println("Es handelt sich um einen Wartepunkt");
-									vehicle.currentTour.remove(tourStopp);
-									int sizeAfterRemoving = vehicle.currentTour.size();
-									if(sizeAfterRemoving == 0){
-										setCurrentTime(requestTime);
-									}
-								} else if(stoppType == 2){
-									System.out.println("Es handelt sich um einen Pick-Up-Point!");
-									System.out.println("Methode zum Einsammeln des Kunden aufrufen!");
-									vehicle.currentTour.remove(tourStopp);
-									int sizeAfterRemoving = vehicle.currentTour.size();
-									if(sizeAfterRemoving == 0){
-										setCurrentTime(requestTime);
-									}
-								} else {
-									System.out.println("Es handelt sich um einen DeliveryPoint");
-									System.out.println("Methode zum Absetzen des Kunden aufrufen!");
-									vehicle.currentTour.remove(tourStopp);
-									int sizeAfterRemoving = vehicle.currentTour.size();
-									if(sizeAfterRemoving == 0){
-										setCurrentTime(requestTime);
-									}
-								}
-								System.out.println(vehicle.getId()+ ":" + vehicle.getPosition());
-								
-							}
-							
-						} setCurrentTime(requestTime);
-					}
-				}
-			}
-			assignRequestToVehicle(request,vehicles);
-		}
-		/*Berechnung der gesamten Wartezeit
-		double waitingTimeOverall = 0;
-		for(int i = 0; i< requests.size(); i++){
-			Request r = requests.get(i);
-			//double waitingTime = r.getWaitingTime();
-			//waitingTimeOverall =  waitingTimeOverall + waitingTime;
-		}
-		System.out.println("Wartezeit aller Anfragen:" + " " + waitingTimeOverall);
-		double requestCount = requests.size();
-		double averageWaitingTime = waitingTimeOverall / requestCount;
-		System.out.println("Durchschnittliche Wartezeit der Anfragen:" + " " + averageWaitingTime);
-		*/
-		
-	// }
-
-	
-	/*
-	public static double[] createTrainTravelTimes(double endTime, double startTime){
-		double countTravelTimes = (endTime - startTime) *2;
-		double [] trainTravelTimes = new double[(int) countTravelTimes];
-		System.out.println("Anzahl Fahrzeiten:" + countTravelTimes);
-		trainTravelTimes[0] = startTime;
-		for(int i = 1; i < countTravelTimes; i++){
-			int lastIndex = i-1;
-			double lastTravelTime = trainTravelTimes[lastIndex];
-			trainTravelTimes[i] = lastTravelTime + 0.5;
-			System.out.println("Abfahrtzeit:" + trainTravelTimes[i]);
-		}
-		return trainTravelTimes;
-	}
-	*/
 	
 	public static void testMethodSwapping(ArrayList <Vehicle> v){
 		ArrayList<Vehicle> vehicleCopy = new ArrayList<Vehicle>(v);
@@ -308,40 +145,7 @@ public class Simulation {
 			System.out.println("Ursprungsliste:" + vehicle.getId() + ";");
 		}
 	}
-	
-	/*public static void testSwappingWithIndex(int x, int y){
-		int a =7;
-		int s = 50;
-<<<<<<< HEAD
-		createVehicles(a,s);
-=======
-		createVehicles(7,5, 50);
->>>>>>> 489072c831556c8ebee342d33e08ae9ef9ed62cf
-		System.out.println(allVehicles.size());
-		for(int i = 0; i<allVehicles.size();i++){
-			Vehicle vehicle = allVehicles.get(i);
-			System.out.println("Fahrzeugliste vor Swap:" + vehicle.getId());
-		}
-		ArrayList<TestList> testList = new ArrayList<TestList>();
-		for(int i = y; i > x; i-- ){
-			ArrayList<Vehicle> copyVehicles = new ArrayList<Vehicle>(allVehicles);
-			int z = i - 1;
-			Collections.swap(copyVehicles, i, z);
-			System.out.println("getauschte Elemente:" + i + " " + z);
-			TestList test = new TestList(copyVehicles);
-			testList.add(test);
-			for(int k = 0; k<allVehicles.size();k++){
-				Vehicle v = allVehicles.get(k);
-				System.out.println("Fahrzeugliste nach Swap pro Schritt:" + v.getId());
-		}
-		}
-		for(int i = 0; i<allVehicles.size();i++){
-			Vehicle v = allVehicles.get(i);
-			System.out.println("Fahrzeugliste nach Swap:" + v.getId());
-		}
-		
-		
-	}*/
+
 	
 	public static void createTestData(ArrayList<Vehicle> vehicles, double maxWaitingTime, double maxDrivingTime, int cap){
 		waitingTimesOfCustomers = new ArrayList<Times>();
@@ -380,22 +184,34 @@ public class Simulation {
 		
 		
 	}
-	
+	/**
+	 * Diese Methode startet die Simulation.
+	 * @param waitingStrategy, die Wartestrategie, welche untersucht werden soll.
+	 * @param startTime,die Zeit, wann der Betriebshorizont starten soll.
+	 * @param endTime, die Zeit wann der Betriebshorizont endet
+	 * @param requests, Liste mit Anfragen
+	 * @param vehicles, Liste der eingesetzten Fahrzeuge
+	 * @param maxWaitingTime, maximal erlaubte Wartezeit der Kunden zur Bedienung
+	 * @param maxDrivingTime maximale Fahrzeit der Insassen.
+	 * @param maxCapacity maximale Kapazität der Fahrzeuge
+	 * @param maxMovingPosition, maximale Verschiebung der Kunden(wurde allerdings noch nicht implementiert)
+	 */
 	public static void startSimulation(int waitingStrategy,double startTime, double endTime,  ArrayList<Request> requests, ArrayList<Vehicle> vehicles,double maxWaitingTime,double maxDrivingTime,int maxCapacity,int maxMovingPosition){
 		waitingTimesOfCustomers = new ArrayList<Times>();
+		driveTimesOfCustomers = new ArrayList<DriveTimesOfCustomers>();
 		switch (waitingStrategy) {
-			case 0: 
+			case 0:
 				Touring.touringWithWaitAtCurrentPosition(startTime, endTime, requests, vehicles, maxWaitingTime, maxWaitingTime, maxCapacity, maxMovingPosition, waitingTimesOfCustomers);
-				printOutput(waitingTimesOfCustomers, allRequests);
+				printOutput(waitingTimesOfCustomers, allRequests,vehicles);
 				break;
 			case 1: 
 				ArrayList<Point> allPoints = waitingStrategies.createListWithAllPoints(startPoint);
 				Touring.touringWithCenterOfGravity(startTime, endTime, requests, vehicles, maxWaitingTime, maxDrivingTime, maxCapacity, maxMovingPosition, waitingTimesOfCustomers, allPoints, startPoint);
-				printOutput(waitingTimesOfCustomers, allRequests);
+				printOutput(waitingTimesOfCustomers, allRequests,vehicles);
 				break;
 			case 2: 
 				Touring.touringWithDriveFirstWaitStrategy(startTime, endTime, requests, vehicles, maxWaitingTime, maxDrivingTime, maxCapacity, maxMovingPosition, waitingTimesOfCustomers);
-				printOutput(waitingTimesOfCustomers, allRequests);
+				printOutput(waitingTimesOfCustomers, allRequests,vehicles);
 				break;
 			
 		}
@@ -404,7 +220,7 @@ public class Simulation {
 		
 	}
 	
-	public static void printOutput(ArrayList<Times> waitingTimesOfCustomers,ArrayList<Request> requests){
+	public static void printOutput(ArrayList<Times> waitingTimesOfCustomers,ArrayList<Request> requests,ArrayList<Vehicle> vehicles){
 		Collections.sort(waitingTimesOfCustomers);
 		for (Times time : waitingTimesOfCustomers) {
 			double waitTime = time.getWaitingTime();
@@ -413,7 +229,7 @@ public class Simulation {
 		}
 		Times minTime = waitingTimesOfCustomers.get(0);
 		double minWaiting = minTime.getWaitingTime();
-		double roundedMinTime = Math.round(minWaiting * 10.0) / 10.0 * 60;
+		double roundedMinTime = Math.round(minWaiting * 60);
 		System.out.println("Die minimale Wartezeit hat der Kunde:" + minTime.getRequestId() + " " + "mit einer Wartezeit von:" + roundedMinTime + " " +"Minuten.");
 		int size = waitingTimesOfCustomers.size();
 		int lastIndex = size - 1;
@@ -426,9 +242,18 @@ public class Simulation {
 		System.out.println("Die durchschnittliche Wartezeit betraegt:" + roundedAverageTime + " " +"Minuten.");
 		double serviceLevel = calculateServiceLevel(requests);
 		System.out.println("Der Servicegrad betraegt:" + serviceLevel + "%");
+		int maxUsedCap = maxUsedCapacityOfVehicles(vehicles);
+		System.out.println("Die Größte Kapazitätsauslastung war eine Personenanzahl von:" + maxUsedCap);
+		int averageUsedCap = averageUsedCapacityOfVehicles(vehicles);
+		System.out.println("Die durchschnittliche Kapazitätsauslastung war eine Personenanzahl von:" + maxUsedCap);
 		
 	}
-	
+	/**
+	 * Diese Methode berechnet die durchschnittliche Wartezeit aller Kunden.
+	 * 
+	 * @param waitingTimeOfCustomers
+	 * @return
+	 */
 	public static double calculateAverageWaitingTime(ArrayList<Times> waitingTimeOfCustomers){
 		int size = waitingTimeOfCustomers.size();
 		double waitingTime = 0.0;
@@ -454,43 +279,75 @@ public class Simulation {
 		return (servedRequests / size) * 100;
 	}
 	
+	public static int maxUsedCapacityOfVehicles(ArrayList<Vehicle> vehicles){
+		int maxUsedCap = 0;
+		for(int i = 0; i< vehicles.size(); i++){
+			Vehicle v = vehicles.get(i);
+			int usedCapOfVehicle = v.getUsedCap();
+			if(usedCapOfVehicle > maxUsedCap){
+				maxUsedCap = usedCapOfVehicle;
+			}
+		}
+		return maxUsedCap;
+	}
+	
+	public static int averageUsedCapacityOfVehicles(ArrayList<Vehicle> vehicles){
+		int averageUsedCap = 0;
+		int size = vehicles.size();
+		for(int i = 0; i< vehicles.size(); i++){
+			Vehicle v = vehicles.get(i);
+			int usedCapOfVehicle = v.getUsedCap();
+			averageUsedCap = averageUsedCap + usedCapOfVehicle; 
+		}
+		averageUsedCap = averageUsedCap / size;
+		return averageUsedCap;
+	}
+	
 	public static void main(String[] args) {
-		File requestsFile = new File("test_data1.csv");
+		File requestsFile = new File("customer_with_50.csv");
 
 		if(!requestsFile.exists()) {
 			ArrayList<Request> requests = Datengenerator.createRequests(typeOneRequests, typeTwoRequests, startTime, endTime, lastFeasibleRequestTime);
 			Datengenerator.exportRequests(requests, requestsFile);
 		}
+		
+		File requestsWith80Customers = new File("80_customer.csv");
+		
+		if(!requestsWith80Customers.exists()) {
+			ArrayList<Request> requests = Datengenerator.createRequests(typeOneRequests, typeTwoRequests, startTime, endTime, lastFeasibleRequestTime);
+			Datengenerator.exportRequests(requests, requestsWith80Customers);
+		}
 
 		allRequests = Datengenerator.importRequests(requestsFile);
+		ArrayList<Request> allRequests2 = Datengenerator.importRequests(requestsWith80Customers);
 
-		// printRequests(allRequests);
+		Point p1 = new Point(2,2);
+		Point p2 = new Point(4,1);
+		double distance = calculateDistanceBetween2Points(p1,p2);
+		double driveTime = calculateDriveTimeToPoint(distance);
+		System.out.println("Fahrzeit:" + driveTime);
+		
+	
+		
+		
+		//printRequests(allRequests);
+		printRequests(allRequests2);
 		createVehicles(countVehicle,speed);
-		// testMethodSwapping(allVehicles);
-		// flowSimulation(allRequests,allVehicles);
-		// createTrainTravelTimes(endTime, startTime);
-		// testSwappingWithIndex(2,4);
-		// createTestData(allVehicles,maxWaitingTime,maxDrivingTime,capacity);
+		
 		
 
-		//Test mit Strategie 0
+		
+		// Test mit Strategie 0
 		//startSimulation(waitingStrategyAtCurrentPosition,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
 		//Test mit Strategie 1
-		// startSimulation(waitingStrategyCenterOfGravity,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
+		//startSimulation(waitingStrategyCenterOfGravity,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
 		//Test mit Strategie 2:
-		//startSimulation(waitingStrategyDriveFirst,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
-
-		// Test mit Strategie 0
-		// startSimulation(waitingStrategyAtCurrentPosition,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
-		// Test mit Strategie 1
-		// startSimulation(waitingStrategyCenterOfGravity,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
-		// Test mit Strategie 2:
 		startSimulation(waitingStrategyDriveFirst,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
 
 		
-		// printOutput(waitingTimesOfCustomers,allRequests);
-		// ArrayList<Point> points = waitingStrategies.createListWithAllPoints(startPoint);
-		// waitingStrategies.calculateCenterOfGravity(points);
+		//printOutput(waitingTimesOfCustomers,allRequests);
+		ArrayList<Point> points = waitingStrategies.createListWithAllPoints(startPoint);
+		waitingStrategies.calculateCenterOfGravity(points);
 
 	}
 }

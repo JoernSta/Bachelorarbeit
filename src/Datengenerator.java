@@ -46,6 +46,15 @@ public class Datengenerator {
 		return createRequests;
 	}
 	
+	/**
+	 * Diese methode erstellt die Anfragen, für den ersten Befoerderungstypen
+	 * @param typeOneRequests, Anzahl an zu erstellende Anfragen.
+	 * @param requests Liste in welcher die Requests gespeichert werden sollen.
+	 * @param startTime Start des Betriebshorizonts
+	 * @param endTime Ende des Betriebshorizonts
+	 * @param arrayTrainTimes Array mit den Abfahrtszeiten
+	 * @param lastRequestTime Zeitpunkt zu welcher Zeit die letzte Anfrage eintreffen darf.
+	 */
 	public static void createTypeOneRequests(int typeOneRequests, ArrayList <Request> requests, double startTime, double endTime, double[] arrayTrainTimes, double  lastRequestTime){
 		for(int i = 0; i < typeOneRequests;i++){
 			Random random = new Random();
@@ -59,13 +68,19 @@ public class Datengenerator {
 			int randomDropX = random.nextInt(5);
 			int randomDropY = createRandomNumber(1,6);
 			Point dropOff = new Point(randomDropX,randomDropY);
+			//Spaetester Zeitpunkt beträgt eine Stunde nach Anfragenstelllung.
 			double lateWindow = randomRequestTime + 1.0;
 			double window = random.nextDouble() * (lateWindow - randomRequestTime) + randomRequestTime;
+			//Gehe die Abfahrtszeiten am Umsteigepunkt durch
 			for(int j = 0; j < arrayTrainTimes.length; j++){
 				if(window < arrayTrainTimes[j]){
 					window = arrayTrainTimes[j-1];
+					//Für den Fall, dass das Fenster, also die Zeit wann der Kunde den Service nutzen möchte geringer ist, dann erhöhe diesen um eine halbe Stunde.
 					if(window < randomRequestTime){
 						window = window + 0.5;
+						if(window > endTime){
+							window = endTime;
+						}
 					}
 					break;
 				}
@@ -115,28 +130,7 @@ public class Datengenerator {
 			requests.add(request);
 		}	
 	}
-	/*
-	public static void createTypeThreeRequests(int typeThreeRequests, ArrayList <Request> requests, double startTime, double endTime){
-		for(int i = 0; i < typeThreeRequests;i++){
-			Random random = new Random();
-			double randomRequestTime = random.nextDouble() * (endTime - startTime) + startTime;
-			int randomPickUpX = random.nextInt(4);
-			int randomPickUpY = createRandomNumber(1,5);
-			Point pickUp = new Point(randomPickUpX,randomPickUpY);
-			int randomDropX = random.nextInt(4);
-			int randomDropY = createRandomNumber(1,5);
-			Point dropOff = new Point(randomDropX,randomDropY);
-			double lateWindow = randomRequestTime +1;
-			double window = random.nextDouble() * (lateWindow - randomRequestTime) + randomRequestTime;
-			int passengerNr = createRandomNumber(1,4);
-			int type = 3;
-			int id = i+1;
-			int state = 0;
-			Request request = new Request(id,randomRequestTime,pickUp,dropOff,passengerNr,state,type,window);
-			requests.add(request);
-		}
-	}
-*/	
+	
 	public static int createRandomNumber(int untereGrenze, int obereGrenze){
 		Random random = new Random();
 		int randomNumber = random.nextInt(obereGrenze);

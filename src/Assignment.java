@@ -29,7 +29,7 @@ public class Assignment {
 	 */
 	public static void assignTypeOneRequest(Request currentRequest, ArrayList<Vehicle> vehicles, double maxWaitingTime, double maxDrivingTime,int maxCapacity, double endTime, int maxMovingPosition,ArrayList<Times> waitingTimesOfCustomers){
 		int requestId = currentRequest.getId();
-		System.out.println("CurrentRequestId:" + requestId);
+		System.out.println("CurrentRequestId:" + requestId + " " + "RequestTime:" + currentRequest.getRequestTime());
 		int passengers = currentRequest.getPassengerNr();
 		int serviceType = currentRequest.getType();
 		double currentTime = currentRequest.getRequestTime();
@@ -39,8 +39,7 @@ public class Assignment {
 		double lastArrivalTime = serviceTime + maxWaitingTime;
 		double lastDropOffTime = lastArrivalTime + maxDrivingTime;
 		ArrayList<AssignedVehicle> vehicleForAssigning = new ArrayList<AssignedVehicle>();
-		
-		System.out.println("Assigningliste zu Beginn des Assignings:" + vehicleForAssigning.size());	
+			
 		
 		//Die Liste Vehicles kopieren/clonen.
 		//Gehe Liste der Fahrzeuge durch, nutze dafï¿½r eine Kopie der originalen Liste.
@@ -51,7 +50,8 @@ public class Assignment {
 
 			int tourSize = tour.size();
 			System.out.println("Kopierte Tourenliste des Fahrzeuges vor der Zuweisung:" + tourSize);
-			//Falls die Tour leer ist fï¿½ge die Serviceanfrage vorne ein, berechne vorher die Zeiten
+			//Falls die Tour leer ist fuege die Serviceanfrage vorne ein, berechne vorher die Zeiten
+			//wenn die Strategie
 			if (tourSize == 0) {
 				Point currentPosition = vehicle.getPosition();
 				double distance = Simulation.calculateDistanceBetween2Points(currentPosition, pickUpPoint);
@@ -99,10 +99,10 @@ public class Assignment {
 			}
 			//Wenn die Tour bereits Punkte enthaelt, dann ueberpruefe drei moegliche Faelle
 			if (tourSize > 0) {
-				//Fall 1: die serviceTime ist kleiner als die serviceTime der bisherigen Pick-up Points in der Tour â†’ Fuege den Punkt vorne an und den drop-Off Point dahinter.
+				//Fall 1: die serviceTime ist kleiner als die serviceTime der bisherigen Pick-up Points in der Tour und Fuege den Punkt vorne an und den drop-Off Point dahinter.
 				//Fall 2: die ServiceTime ist groesser als die bisherigen	Pick-Up-Points --> Fuege Punkt hinten an der Liste ein.
 				//Fall 3: Die serviceTime ist gleich der schon bisherigen Pick-Up-Points --> Fuege den Pick-Up Point an der letzten Stelle der Pick-Up Points ein, wo die gleiche Servicezeit ist.
-				//Fï¿½ge Drop-Off Punkt an die letzte Stelle der zugehoerigen Pick-Up Points
+				//Fuege Drop-Off Punkt an die letzte Stelle der zugehoerigen Pick-Up Points
 				//Swappe Positionen der Drop-Off Punkte durch
 				int indexOfPickUpPoint = 0;
 				int indexOfDropOffPoint = 0;
@@ -126,7 +126,7 @@ public class Assignment {
 				}
 				//ueberpruefe, ob der zuvor festgelegte Punkt kleiner als null ist, wenn ja, dann fuege den Pick-Up-Point und den DropOff-Point an den Anfang der Tour ein.
 				if (indexOfPickUpPoint >= tour.size()) {
-					//0.0 sind Platzhalter, die Sachen werden noch berechnet.
+					//0.0 sind Platzhalter, die die genauen Werte werden noch berechnet.
 					Stopp pickUpStopp = new Stopp(requestId, pickUpPoint, 0.0, 2, 0.0, 0.0, passengers, 0, serviceTime, 1);
 					//Fehler bei Id und serviceTime
 					pickUpStopp.setRequestId(requestId);
@@ -202,7 +202,7 @@ public class Assignment {
 	public static void assignTypeTwoRequest(Request currentRequest, ArrayList<Vehicle> vehicles, double maxWaitingTime, double maxDrivingTime,int maxCapacity,double endTime, int maxMovingPosition,ArrayList<Times> waitingTimesOfCustomers){
 		
 		int requestId = currentRequest.getId();
-		System.out.println("CurrentRequestId:" + requestId);
+		System.out.println("CurrentRequestId:" + requestId + " " + currentRequest.getRequestTime());
 		int passengers = currentRequest.getPassengerNr();
 		int serviceType = currentRequest.getType();
 		double currentTime = currentRequest.getRequestTime();
@@ -286,6 +286,7 @@ public class Assignment {
 				// Wenn der Index groesser gleich der Tourengroesse â†’ fuege beide Punkte ans Ende an
 				// Sonst fuege die Punkte entsprechend an dem index ein.
 				if (indexOfPickUp >= tour.size()) {
+					Stopp lastStopp = tour.get(tour.size() - 1);
 					Stopp pickUpStopp = new Stopp(requestId, pickUpPoint, 0.0, 2, 0.0, 0.0, passengers, 0, serviceTime, 2);
 					pickUpStopp.setRequestId(requestId);
 					pickUpStopp.setRequestType(2);
@@ -360,23 +361,11 @@ public class Assignment {
 					}
 				}
 			}
-
-			/*
-			vehicle.currentTour = new ArrayList<>(tour);
-			System.out.println("Tourengroesse nach Assigning:" + vehicle.currentTour.size());
-			for(int h=0; h<tour.size();h++){
-				Stopp stopp = tour.get(h);
-				System.out.println("FahrzeugId:" + "" + vehicle.getId() + " " + "RequestId:" + stopp.getRequestId() + " " + stopp.getStopp() + " " + "ArrivalTime:" + stopp.getArrivalTime() + " " + "Abfahrtszeit:" + stopp.getPlannedDeaparture() + " " + "LatestArrivalTime:" + stopp.getLatestArrivalTime() + " " + "Servicezeit:" + stopp.getServiceTime());
-			}
-			System.out.println("Assigningliste nach Assigning:" + vehicle.currentTour.size());
-			tour.clear();
-			System.out.println("Tourengroesse nach clear:" + tour.size());
-			*/
 		}
 		//Zuweisung der Anfrage zur Tour.
 		
 		System.out.println("Assigningliste nach Zuweisungen:" + vehicleForAssigning.size());
-		//Hier kommt dann das Assignment hin.
+		//Methode chooseTour wählt die Zuweisung aus, oder die Ablehnung einer Anfrage
 		chooseTour(vehicleForAssigning, endTime, maxMovingPosition,  maxCapacity, currentRequest,vehicles,waitingTimesOfCustomers,maxWaitingTime);
 	}
 	//Ende for-Schleife
@@ -384,7 +373,12 @@ public class Assignment {
 		
 		
 	
-	
+	/**
+	 * Diese Methode überprüft ob die Wartezeit des Kunden die maximale Wartezeit nicht überschreitet.
+	 * @param time1, Wartezeit der Kunden.
+	 * @param time2, maximaleWartezeit
+	 * @return
+	 */
 	public static boolean checkWaitingTime(double time1, double time2){
 		return time1 < time2;
 	}
@@ -639,18 +633,22 @@ public class Assignment {
 			//Wenn es sich um den zweiten Typ handelt und um einen Pick-Up-Point dann, betrachte die Distanz zum Umsteigepunkt und schaue wie sich die Ankunftszeit mit der fuehsmoeglichen Ankunftszeit verhaelt.
 			if(requestType == 2 && stoppType == 2){
 				//Position des Umsteigepunktes
-				Point targetPoint = new Point(0,2);
+				Point targetPoint = new Point(2,0);
 				double distanceToDropOffPoint = Simulation.calculateDistanceBetween2Points(currentPoint,targetPoint);
 				double driveTimeToDropOffPoint = Simulation.calculateDriveTimeToPoint(distanceToDropOffPoint);
 				double arrivalTimeToDropOff = arrivalTimeAtCurrentStopp + driveTimeToDropOffPoint;
 				double earliestArrivalTimeAtDropOff = serviceTimeOfCurrentStopp - maxWaitingTime;
-				//Wenn die geplante Ankunft am DropOff Punkt kleiner ist, als der fruehestmoegliche Zeitpunkt ist, dann erhï¿½he die geplante Ankunft/Abfahrt von dem Pick-Up Punkt um die Zeitdifferenz.
+				//Wenn die geplante Ankunft am DropOff Punkt kleiner ist, als der fruehestmoegliche Zeitpunkt ist, dann erhï¿½he die geplante Ankunft/Abfahrt von dem Pick-Up Punkt um die Zeitdifferenz von der frühstmöglichen Ankuft minus der Fahrzeit.
 				if(arrivalTimeToDropOff < earliestArrivalTimeAtDropOff){
 					double timeDifference = earliestArrivalTimeAtDropOff - arrivalTimeToDropOff;
-					double departureTime = arrivalTimeAtCurrentStopp + timeDifference;
-					double latestDeparture = departureTime + maxWaitingTime;
+					double departureTime = earliestArrivalTimeAtDropOff - driveTimeToDropOffPoint;
+					double serviceTime = currentStopp.getServiceTime();
+					double latestDeparture = serviceTime - driveTimeToDropOffPoint;
 					currentStopp.setPlannedDeparture(departureTime);
 					currentStopp.setLatestArrivalTime(latestDeparture);
+					System.out.println("Zeitunterschied" + timeDifference);
+					System.out.println("Fahrzeit:" + driveTimeToDropOffPoint);
+					System.out.println("Frühstmögliche Ankunft am dropofftime:" + earliestArrivalTimeAtDropOff);
 				} else{
 					double departureTime = arrivalTimeAtCurrentStopp;
 					double timeDifference = serviceTimeOfCurrentStopp - arrivalTimeToDropOff;
@@ -673,8 +671,7 @@ public class Assignment {
 					}
 				}
 			}
-		}
-		
+		}	
 	}
 	/**
 	 * 

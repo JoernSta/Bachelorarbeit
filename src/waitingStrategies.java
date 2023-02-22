@@ -22,30 +22,48 @@ public class waitingStrategies {
 		}
 		return allPoints;
 	}
-	
-	public static ArrayList<Point> calculateReachablePoints(ArrayList<Point> points, Vehicle vehicle, double currentTime,double endTime,Point transferPoint){
+	/**
+	 * Diese Methode bestimmt alle Punkte welche von der aktuellen Position aus erreicht werden können.
+	 * @param points
+	 * @param vehicle
+	 * @param currentTime
+	 * @param endTime
+	 * @param targetPoint
+	 * @return
+	 */
+	public static ArrayList<Point> calculateReachablePoints(ArrayList<Point> points, Vehicle vehicle, double currentTime,double endTime,Point targetPoint){
 		Point currentPosition = vehicle.getPosition();
-		double arrivalTimeFromCurrentPointToTransferPoint = 0.0;
+		
 		ArrayList<Point> reachablePoints= new ArrayList<Point>();
 		for (Point currentPoint : points) {
+			
 			double distanceFromVehiclePositionToCurrentPoint = Simulation.calculateDistanceBetween2Points(currentPosition, currentPoint);
 			double driveTimeFromVehiclePositionToCurrentPoint = Simulation.calculateDriveTimeToPoint(distanceFromVehiclePositionToCurrentPoint);
 			double arrivalTimeToCurrentPoint = currentTime + driveTimeFromVehiclePositionToCurrentPoint;
 			if (vehicle.currentTour.size() == 0) {
-				double distancefromCurrentPointToTransferPoint = Simulation.calculateDistanceBetween2Points(currentPoint, transferPoint);
-				double driveTimeFromCurrentPointToTransferPoint = Simulation.calculateDriveTimeToPoint(distancefromCurrentPointToTransferPoint);
-				arrivalTimeFromCurrentPointToTransferPoint = arrivalTimeToCurrentPoint + driveTimeFromCurrentPointToTransferPoint;
+				double distancefromCurrentPointToPoint = Simulation.calculateDistanceBetween2Points(currentPoint, targetPoint);
+				double driveTimeFromCurrentPointToPoint = Simulation.calculateDriveTimeToPoint(distancefromCurrentPointToPoint);
+				double arrivalTimeFromCurrentPointToTransferPoint = arrivalTimeToCurrentPoint + driveTimeFromCurrentPointToPoint;
+				if (arrivalTimeFromCurrentPointToTransferPoint <= endTime) {
+					reachablePoints.add(currentPoint);
+				}
 			} else {
-				int lastIndex = vehicle.currentTour.size() - 1;
-				Stopp lastStopp = vehicle.currentTour.get(lastIndex);
-				Point pointOfLastStopp = lastStopp.getStopp();
-				double departureTime = lastStopp.getPlannedDeaparture();
-				double distanceFromLastStoppToTransferPoint = Simulation.calculateDistanceBetween2Points(pointOfLastStopp, transferPoint);
-				double driveTimeFromLastStoppToTransferPoint = Simulation.calculateDriveTimeToPoint(distanceFromLastStoppToTransferPoint);
-				arrivalTimeFromCurrentPointToTransferPoint = departureTime + driveTimeFromLastStoppToTransferPoint;
-			}
-			if (arrivalTimeToCurrentPoint < endTime && arrivalTimeFromCurrentPointToTransferPoint <= endTime) {
-				reachablePoints.add(currentPoint);
+				Stopp nextStopp = vehicle.currentTour.get(0);
+				double arrivalOfNextStopp = nextStopp.getArrivalTime();
+				if(currentTime > arrivalOfNextStopp){
+					currentTime = arrivalOfNextStopp;
+				}
+				distanceFromVehiclePositionToCurrentPoint = Simulation.calculateDistanceBetween2Points(currentPosition, currentPoint);
+				driveTimeFromVehiclePositionToCurrentPoint = Simulation.calculateDriveTimeToPoint(distanceFromVehiclePositionToCurrentPoint);
+				arrivalTimeToCurrentPoint = currentTime + driveTimeFromVehiclePositionToCurrentPoint;
+				double servingTime = nextStopp.getPlannedDeaparture();
+				Point nextStoppPoint = nextStopp.getStopp();
+				double distanceFromPointToTargetPoint = Simulation.calculateDistanceBetween2Points(currentPoint, nextStoppPoint);
+				double driveTimeFromCurrentPositionToTargetPoint = Simulation.calculateDriveTimeToPoint(distanceFromPointToTargetPoint);
+				double arrivalTimeToTargetPoint = arrivalTimeToCurrentPoint + driveTimeFromCurrentPositionToTargetPoint;
+				if(arrivalTimeToTargetPoint <= servingTime){
+					reachablePoints.add(currentPoint);
+				}
 			}
 		}
 		return reachablePoints;

@@ -19,13 +19,11 @@ public class Vehicle {
 
 	
 
-	public Vehicle(int id, Point p, int cap, int speed, ArrayList<Request> assignedReq, ArrayList<Request> curPas, ArrayList<Stopp> curTour,int usedCap) {
+	public Vehicle(int id, Point p, int cap, int speed, ArrayList<Stopp> curTour,int usedCap) {
 		this.id = id;
 		this.position =  p;
 		this.capacity = cap;
 		this.speed = speed;
-		this.assignedRequests = assignedReq;
-		this.currentPassengers = curPas;
 		this.currentTour = curTour;
 		this.usedCap = usedCap;
 	}
@@ -70,43 +68,6 @@ public class Vehicle {
 		this.hasTour = b;
 	}
 	
-	public void pickUpPassenger(Request passenger, Vehicle vehicle){
-		vehicle.currentPassengers.add(passenger);
-		int passengerNr = passenger.getPassengerNr();
-		int updatedCapacity = vehicle.getCapacity() - passengerNr;
-		vehicle.setCapacity(updatedCapacity);
-	}
-	
-	public void deliverPassenger(Request passenger, Vehicle vehicle){
-		int index = 0;
-		int requestId = passenger.getId();
-		int passengerNr = passenger.getPassengerNr();
-		int updatedCapacity = vehicle.getCapacity() + passengerNr;
-		for(int i = 0; i < vehicle.currentPassengers.size(); i++){
-			Request request = vehicle.currentPassengers.get(i);
-			int id = request.getId();
-			if(id == requestId){
-				index = i;
-			}
-		}
-		vehicle.setCapacity(updatedCapacity);
-		vehicle.currentPassengers.remove(index);
-	}
-	
-	// gibt die Anfrage mit der eingegebenen id zurueck
-	public Request getSpecificRequest(int id, Vehicle vehicle, Stopp currentStopp){
-		Request specificRequest = vehicle.assignedRequests.get(0);
-		for(int i = 0; i<vehicle.assignedRequests.size();i++){
-			Request request = vehicle.assignedRequests.get(i);
-			int requestId = request.getId();
-			if(requestId == id){
-				specificRequest = request;
-			}
-		}
-		return specificRequest;
-	}
-	
-
 	public int getUsedCap(){
 		return usedCap;
 	}
