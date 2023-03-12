@@ -120,7 +120,14 @@ public class Datengenerator {
 					}
 					break;
 				}
-				
+			}
+			double distanceOfCustomer = Simulation.calculateDistanceBetween2Points(dropOff, pickUp) * 2;//Weg des Kunden ausgehend von dem Startpunkt zum pickUp und wieder zurueck.
+			double driveTime = Simulation.calculateDriveTimeToPoint(distanceOfCustomer);
+			double timeForRequest = randomRequestTime + driveTime;
+			//Wenn die Anfrage zu kurzfristig eingehen wuerde und somit nicht bedienbar waere, dann reduziere den Zeitpunkt der Anfrage.
+			if(timeForRequest > window){
+				double timeDifference = timeForRequest - window;
+				randomRequestTime = randomRequestTime - timeDifference;
 			}
 			int passengerNr = createRandomNumber(1,5);
 			int type = 2;

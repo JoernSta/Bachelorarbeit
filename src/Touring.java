@@ -9,97 +9,7 @@ import java.util.Collections;
  */
 public class Touring {
 	
-	public static void touringWithWaitAtCurrentPosition(double startTime, double endTime,  ArrayList<Request> requests, ArrayList<Vehicle> vehicles,double maxWaitingTime,double maxDrivingTime,int maxCapacity,int maxMovingPosition,ArrayList<Times> waitingTimesOfCustomers){
-		Simulation.setCurrentTime(startTime);
-		double currentTime = Simulation.getCurrentTime();
-		for(int i = 0; i < requests.size(); i++){
-			Request request = requests.get(i);
-			double requestTime = request.getRequestTime();
-			if(requestTime > currentTime) {
-				for (Vehicle vehicle : vehicles) {
-					int tourSize = vehicle.currentTour.size();
-					Point positionOfVehicle = vehicle.getPosition();
-					if (tourSize == 0) {
-						System.out.println("Fahrzeug:" + vehicle.getId() + " " + "hat keine aktuelle Tour");
-						System.out.println("Fahrzeug wartet an der Position:" + positionOfVehicle);
-					} else {
-						for (int h = 0; h < vehicle.currentTour.size(); h++) {
-							Stopp currentStopp = vehicle.currentTour.get(h);
-							Point pointOfCurrentStopp = currentStopp.getStopp();
-							double arrivalTime = currentStopp.getPlannedDeaparture();
-							if (arrivalTime > currentTime && arrivalTime <= requestTime) {
-								vehicle.setPosition(pointOfCurrentStopp);
-								int stoppType = currentStopp.getType();
-								if (stoppType == 2) {
-									int passengersOfStopp = currentStopp.getPassengers();
-									int currentCapacity = vehicle.getCapacity();
-									int updatedCapacity = currentCapacity + passengersOfStopp;
-									vehicle.setCapacity(updatedCapacity);
-									int usedCapacityOfVehicle = vehicle.getUsedCap();
-									if(updatedCapacity > usedCapacityOfVehicle){
-										vehicle.setUsedCap(updatedCapacity);
-									}
-									int requestIdOfStopp = currentStopp.getRequestId();
-
-									for (Request requestOfList : requests) {
-										int id = requestOfList.getId();
-										if (id == requestIdOfStopp) {
-											requestOfList.setPassengerState(2);
-											vehicle.currentTour.remove(h);
-											h = h - 1;
-											break;
-										}
-									}
-									Simulation.setCurrentTime(arrivalTime);
-								} else if (stoppType == 3) {
-									int passengersOfStopp = currentStopp.getPassengers();
-									int currentCapacity = vehicle.getCapacity();
-									int updatedCapacity = currentCapacity - passengersOfStopp;
-									vehicle.setCapacity(updatedCapacity);
-									vehicle.currentTour.remove(h);
-									h = h - 1;
-
-
-									Simulation.setCurrentTime(arrivalTime);
-								} else if (arrivalTime < currentTime && arrivalTime <= requestTime) {
-									vehicle.setPosition(pointOfCurrentStopp);
-									stoppType = currentStopp.getType();
-									if (stoppType == 2) {
-										int passengersOfStopp = currentStopp.getPassengers();
-										int currentCapacity = vehicle.getCapacity();
-										int updatedCapacity = currentCapacity + passengersOfStopp;
-										vehicle.setCapacity(updatedCapacity);
-										int requestIdOfStopp = currentStopp.getRequestId();
-
-										for (Request requestOfList : requests) {
-											int id = requestOfList.getId();
-											if (id == requestIdOfStopp) {
-												requestOfList.setPassengerState(2);
-												vehicle.currentTour.remove(h);
-												h = h - 1;
-												break;
-											}
-										}
-									} else if (stoppType == 3) {
-										int passengersOfStopp = currentStopp.getPassengers();
-										int currentCapacity = vehicle.getCapacity();
-										int updatedCapacity = currentCapacity - passengersOfStopp;
-										vehicle.setCapacity(updatedCapacity);
-										vehicle.currentTour.remove(h);
-										h = h - 1;
-									}
-								}
-							}
-						}
-					}
-					Simulation.setCurrentTime(requestTime);
-				}
-				
-			}
-			Assignment.requestAssigment(request, vehicles, maxWaitingTime, maxDrivingTime, maxCapacity, maxMovingPosition, endTime,waitingTimesOfCustomers);
-		}
-		finishTours(vehicles,requests);
-	}
+	
 	
 	/**
 	 * Diese Methode bestimmt das Fahrzeugverhalten bei der Center-Of-Gravity-Strategie
@@ -115,7 +25,7 @@ public class Touring {
 	 * @param points Punkte des Servicegebiets
 	 * @param transferPoint Umsteigepunkt
 	 */
-	public static void touringWithCenterOfGravity(double startTime, double endTime,  ArrayList<Request> requests, ArrayList<Vehicle> vehicles,double maxWaitingTime,double maxDrivingTime,int maxCapacity,int maxMovingPosition,ArrayList<Times> waitingTimesOfCustomers,ArrayList<Point> points,Point transferPoint){
+	public static void touringWithCenterOfGravity(int waitingStrategy, double startTime, double endTime,  ArrayList<Request> requests, ArrayList<Vehicle> vehicles,double maxWaitingTime,double maxDrivingTime,int maxCapacity,int maxMovingPosition,ArrayList<Times> waitingTimesOfCustomers,ArrayList<Point> points,Point transferPoint,ArrayList<DriveTimesOfCustomers> driveTimes){
 
 		
 		Simulation.setCurrentTime(startTime);
@@ -139,13 +49,14 @@ public class Touring {
 						double distanceToWaitingPoint = Simulation.calculateDistanceBetween2Points(vehicle.getPosition(), waitingPoint);
 						double driveTimeToWaitingPoint = Simulation.calculateDriveTimeToPoint(distanceToWaitingPoint);
 						double arrivalTimeToWaitingPoint = currentTime + driveTimeToWaitingPoint;
+						//Wenn das Fahrzeug den Wartepunkt vor dem Eintreffen der nächsten Anfrage erreicht, dann setze die Position des Fahrzeuges um.
 						if (arrivalTimeToWaitingPoint <= requestTime) {
 							vehicle.setPosition(waitingPoint);
 							Simulation.setCurrentTime(arrivalTimeToWaitingPoint);
 							currentTime = Simulation.getCurrentTime();
-							System.out.println("Center-Of-Gravity ist:" + waitingPoint);
+							//System.out.println("Center-Of-Gravity ist:" + waitingPoint);
 						} else {
-							Stopp stopp = new Stopp(0, waitingPoint, arrivalTimeToWaitingPoint, 1, arrivalTimeToWaitingPoint, arrivalTimeToWaitingPoint, 0, 0, 0.0, 0);
+							Stopp stopp = new Stopp(0, waitingPoint, arrivalTimeToWaitingPoint, 1, arrivalTimeToWaitingPoint, arrivalTimeToWaitingPoint, 0, 0, arrivalTimeToWaitingPoint, 0);
 							vehicle.currentTour.add(stopp);
 						}
 						// hat das Fahrzeug eine Tour, so soll die Tour so lange bearbeitet werden, bis die neue Anfrage eintrifft.
@@ -154,6 +65,7 @@ public class Touring {
 							Stopp currentStopp = vehicle.currentTour.get(h);
 							Point pointOfCurrentStopp = currentStopp.getStopp();
 							int stoppType = currentStopp.getType();
+							//Wenn wir einen Wartestopp in der Liste haben, und weitere Punkte in unserer Tour, dann berechne die Abfahrtszeit von diesem Punkt.
 							if(stoppType == 1 && vehicle.currentTour.size()>1){
 								Stopp nextStopp = vehicle.currentTour.get(h+1);
 								double servingTimeOfNextStopp = nextStopp.getPlannedDeaparture();
@@ -166,11 +78,8 @@ public class Touring {
 								currentStopp.setServiceTime(departureFromWaitingPointToNextPoint);
 								double arrivalTimeAtNextStop = departureFromWaitingPointToNextPoint + driveTimeToNextStopp;
 								nextStopp.setArrivalTime(arrivalTimeAtNextStop);
-								//
-							
-								// Berechne Fahrt zu Punkt, sodass wir die späteste Abfahrt und die Servicezeit zu dem nächsten Punkt haben.
-						
 							}
+							
 							double servingTime = currentStopp.getPlannedDeaparture();
 							double arrivalTime = currentStopp.getArrivalTime();
 							//Wir fügen einen Warteort ein, wenn wir einen Zeitpuffer haben, dieser ergibt sich aus der Ankunftszeit des Knotens und Zeit der Kundenbedienung(servingTime)
@@ -188,7 +97,7 @@ public class Touring {
 								Stopp waitingStopp = createStoppPoint(vehicle, currentTime,waitingPoint);
 								vehicle.currentTour.add(h,waitingStopp);
 								System.out.println("Center-Of-Gravity liegt bei:" + waitingPoint);
-								h = h +1;
+								h = -1;
 								double arrivalTimeOfWaitingPoint = waitingStopp.getArrivalTime();
 								double departureTimeFromWaitingPoint = waitingStopp.getPlannedDeaparture();
 								if(arrivalTimeOfWaitingPoint <= requestTime){
@@ -206,8 +115,8 @@ public class Touring {
 								printTour(vehicle);
 								System.out.println("Tourengroeße:" + vehicle.currentTour.size());
 							}
-				
-							if (servingTime >= currentTime && servingTime <= requestTime) {
+				  
+							else if (servingTime >= currentTime && servingTime <= requestTime) {
 								vehicle.setPosition(pointOfCurrentStopp);
 								Simulation.setCurrentTime(servingTime);
 								currentTime = Simulation.getCurrentTime();
@@ -229,6 +138,11 @@ public class Touring {
 											break searchRequests;
 										}
 									}
+									//Fuege die Pick-Up Zeit des Kunden in die Liste der Fahrzeiten ein.
+									double pickUpTime = servingTime;
+									DriveTimesOfCustomers driveTimeOfCustomer = new DriveTimesOfCustomers(requestIdOfStopp,pickUpTime,0.0);
+									driveTimes.add(driveTimeOfCustomer);
+									//Loesche den Pick-Up-Punkt aus der aktuellen Tour
 									vehicle.currentTour.remove(currentStopp);
 									h = -1;
 								} else if (stoppType == 3) {
@@ -236,8 +150,20 @@ public class Touring {
 									int currentCapacity = vehicle.getCapacity();
 									int updatedCapacity = currentCapacity - passengersOfStopp;
 									vehicle.setCapacity(updatedCapacity);
+									// hier die DropOfftime einfuegen
 									vehicle.currentTour.remove(currentStopp);
 									h = -1;
+									//Setze die Drop-Off Zeit fuer den Kunden neu.
+									// Gehe Liste der DriveTimes durch und setze die dropOff Zeit für die entsprechende Anfrage neu.
+									searchDriveTime: for(DriveTimesOfCustomers driveTime : driveTimes){
+										int idOfRequest = currentStopp.getRequestId();
+										int id = driveTime.getRequestId();
+										double dropOffTime = servingTime;
+										if(idOfRequest == id){
+											driveTime.setDropOffTime(dropOffTime);
+											break searchDriveTime;
+										}
+									}
 								} else if (stoppType == 1) {
 									vehicle.currentTour.remove(currentStopp);
 									h = -1;
@@ -262,6 +188,11 @@ public class Touring {
 												break searchRequest;
 											}
 										}
+										//Fuege die Pick-Up Zeit des Kunden in die Liste der Fahrzeiten ein.
+										double pickUpTime = servingTime;
+										DriveTimesOfCustomers driveTimeOfCustomer = new DriveTimesOfCustomers(requestIdOfStopp,pickUpTime,0.0);
+										driveTimes.add(driveTimeOfCustomer);
+										//Loesche den Pick-Up-Punkt aus der aktuellen Tour
 										vehicle.currentTour.remove(currentStopp);
 										h =-1;
 									} else if (stoppType == 3) {
@@ -269,11 +200,22 @@ public class Touring {
 										int currentCapacity = vehicle.getCapacity();
 										int updatedCapacity = currentCapacity - passengersOfStopp;
 										vehicle.setCapacity(updatedCapacity);
+										//Setze die Drop-Off Zeit fuer den Kunden neu.
+										// Gehe Liste der DriveTimes durch und setze die dropOff Zeit für die entsprechende Anfrage neu.
+										searchDriveTime: for(DriveTimesOfCustomers driveTime : driveTimes){
+											int idOfRequest = currentStopp.getRequestId();
+											int id = driveTime.getRequestId();
+											double dropOffTime = servingTime;
+											if(idOfRequest == id){
+												driveTime.setDropOffTime(dropOffTime);
+												break searchDriveTime;
+											}
+										}
 										vehicle.currentTour.remove(currentStopp);
 										h = -1;
-									} else if (stoppType == 1) {
-										vehicle.currentTour.remove(currentStopp);
-										h = -1;
+									}// Ergibt das Sinn, wenn wir nur ankommen und nicht abfahren, dass wir den loeschen? 
+									else if (stoppType == 1) {
+										vehicle.setPosition(currentStopp.getStopp());
 									}
 								}
 							}
@@ -282,14 +224,14 @@ public class Touring {
 				}
 			Simulation.setCurrentTime(requestTime);
 			currentTime = Simulation.getCurrentTime();
-			Assignment.requestAssigment(request, vehicles, maxWaitingTime, maxDrivingTime, maxCapacity, maxMovingPosition, endTime,waitingTimesOfCustomers);
+			Assignment.requestAssigment(waitingStrategy,request, vehicles, maxWaitingTime, maxDrivingTime, maxCapacity, maxMovingPosition, endTime,waitingTimesOfCustomers);
 			}
-		finishTours(vehicles,requests);
+		finishTours(vehicles,requests,driveTimes);
 		}
 	
 
 	
-	public static void touringWithDriveFirstWaitStrategy(double startTime, double endTime,  ArrayList<Request> requests, ArrayList<Vehicle> vehicles,double maxWaitingTime,double maxDrivingTime,int maxCapacity,int maxMovingPosition,ArrayList<Times> waitingTimesOfCustomers){
+	public static void touringWithDriveFirstWaitStrategy(int waitingStrategy,double startTime, double endTime,  ArrayList<Request> requests, ArrayList<Vehicle> vehicles,double maxWaitingTime,double maxDrivingTime,int maxCapacity,int maxMovingPosition,ArrayList<Times> waitingTimesOfCustomers,ArrayList<DriveTimesOfCustomers> driveTimes){
 		Simulation.setCurrentTime(startTime);
 		double currentTime = Simulation.getCurrentTime();
 		for(int i = 0; i < requests.size(); i++){
@@ -303,6 +245,7 @@ public class Touring {
 						System.out.println("Fahrzeug:" + vehicle.getId() + " " + "hat keine aktuelle Tour");
 						System.out.println("Fahrzeug wartet an der Position:" + positionOfVehicle);
 					} else {
+						
 						for (int h = 0; h < vehicle.currentTour.size(); h++) {
 							Stopp currentStopp = vehicle.currentTour.get(h);
 							Point pointOfCurrentStopp = currentStopp.getStopp();
@@ -322,9 +265,13 @@ public class Touring {
 										int maxUsedCapacity = vehicle.getUsedCap();
 										if(maxUsedCapacity < updatedCapacity){
 											vehicle.setUsedCap(updatedCapacity);
+											if(vehicle.getUsedCap() > 6){
+												System.out.println("..............................................Bei dieser Anfrage erhoeht er auf ueber 6:" + " " + currentStopp.getRequestId());
+												
+											}
 										}
 										int requestIdOfStopp = currentStopp.getRequestId();
-										
+										//Setze den Status der Anfrage auf 2 = bedient.
 										searchRequest: for (Request requestOfList : requests) {
 											int id = requestOfList.getId();
 											if (id == requestIdOfStopp) {
@@ -332,19 +279,41 @@ public class Touring {
 												break searchRequest;
 											}
 										}
+										//Fuege die Pick-Up Zeit des Kunden in die Liste der Fahrzeiten ein.
+										
+										double pickUpTime = servingTime;
+										DriveTimesOfCustomers driveTimeOfCustomer = new DriveTimesOfCustomers(requestIdOfStopp,pickUpTime,0.0);
+										driveTimes.add(driveTimeOfCustomer);
+										//Loesche den Pick-Up-Punkt aus der aktuellen Tour
 										vehicle.currentTour.remove(h);
 										h = h - 1;
+										//Setze die aktuelle Zeit auf die Bedienungszeit
 										Simulation.setCurrentTime(servingTime);
 									} else if (stoppType == 3) {
 										int passengersOfStopp = currentStopp.getPassengers();
 										int currentCapacity = vehicle.getCapacity();
 										int updatedCapacity = currentCapacity - passengersOfStopp;
 										vehicle.setCapacity(updatedCapacity);
+										
+										//Setze die Drop-Off Zeit fuer den Kunden neu.
+										// Gehe Liste der DriveTimes durch und setze die dropOff Zeit für die entsprechende Anfrage neu.
+										searchDriveTime: for(DriveTimesOfCustomers driveTime : driveTimes){
+											int idOfRequest = currentStopp.getRequestId();
+											int id = driveTime.getRequestId();
+											double dropOffTime = servingTime;
+											if(idOfRequest == id){
+												driveTime.setDropOffTime(dropOffTime);
+												break searchDriveTime;
+											}
+										}
 										vehicle.currentTour.remove(h);
 										h = h - 1;
 									}
 									Simulation.setCurrentTime(servingTime);
 								}
+								//Diese else-If Abfrage dient dazu, falls ein weiteres Fahrzeug auch eine Tour zu bedienen hat und die arrivalTime allerdings kleiner als die aktuelle Zeit,
+								//welche ggf. vorher hoch gesetzt wurde niedriger ist
+								//Dann soll das Fahrzeug seine Tour auch noch bedienen.
 								} else if (arrivalTime <= currentTime && arrivalTime <= requestTime) {
 									vehicle.setPosition(pointOfCurrentStopp);
 									if(servingTime >= arrivalTime && servingTime <= requestTime){
@@ -359,20 +328,37 @@ public class Touring {
 												vehicle.setUsedCap(updatedCapacity);
 											}
 											int requestIdOfStopp = currentStopp.getRequestId();
-											for (Request requestOfList : requests) {
+											searchRequest: for (Request requestOfList : requests) {
 												int id = requestOfList.getId();
 												if (id == requestIdOfStopp) {
 													requestOfList.setPassengerState(2);
-													vehicle.currentTour.remove(h);
-													h = h - 1;
-													break;
+													break searchRequest;
 												}
 											}
+											//Fuege die Pick-Up Zeit des Kunden in die Liste der Fahrzeiten ein.
+											int idOfPickedUpRequest = currentStopp.getRequestId();
+											double pickUpTime = servingTime;
+											DriveTimesOfCustomers driveTimeOfCustomer = new DriveTimesOfCustomers(idOfPickedUpRequest,pickUpTime,0.0);
+											driveTimes.add(driveTimeOfCustomer);
+											
+											vehicle.currentTour.remove(h);
+											h = h - 1;
 										} else if (stoppType == 3) {
 											int passengersOfStopp = currentStopp.getPassengers();
 											int currentCapacity = vehicle.getCapacity();
 											int updatedCapacity = currentCapacity - passengersOfStopp;
 											vehicle.setCapacity(updatedCapacity);
+											//Setze die Drop-Off Zeit fuer den Kunden neu.
+											// Gehe Liste der DriveTimes durch und setze die dropOff Zeit für die entsprechende Anfrage neu.
+											searchDriveTime: for(DriveTimesOfCustomers driveTime : driveTimes){
+												int idOfRequest = currentStopp.getRequestId();
+												int id = driveTime.getRequestId();
+												double dropOffTime = servingTime;
+												if(idOfRequest == id){
+													driveTime.setDropOffTime(dropOffTime);
+													break searchDriveTime;
+												}
+											}
 											vehicle.currentTour.remove(h);
 											h = h - 1;
 										}
@@ -383,17 +369,22 @@ public class Touring {
 						}
 					}
 					Simulation.setCurrentTime(requestTime);
-					Assignment.requestAssigment(request, vehicles, maxWaitingTime, maxDrivingTime, maxCapacity, maxMovingPosition, endTime,waitingTimesOfCustomers);
+					Assignment.requestAssigment(waitingStrategy,request, vehicles, maxWaitingTime, maxDrivingTime, maxCapacity, maxMovingPosition, endTime,waitingTimesOfCustomers);
 				}
 			}
-			finishTours(vehicles,requests);
+			finishTours(vehicles,requests, driveTimes);
 	}
 	
 	
 		
 	
-	
-	public static void finishTours(ArrayList<Vehicle> vehicles, ArrayList<Request> requests){
+	/**
+	 * Methode, welche die Tour nach dem Eingnag der letzten Anfrage abfaehrt und die Fahrzeiten nochmal anpasst.
+	 * @param vehicles Anzahl der eingesetzten Fahrzeuge
+	 * @param requests Anzahl der Auftraege
+	 * @param driveTimes Liste mit den Fahrzeiten.
+	 */
+	public static void finishTours(ArrayList<Vehicle> vehicles, ArrayList<Request> requests,ArrayList<DriveTimesOfCustomers> driveTimes){
 		for (Vehicle vehicle : vehicles) {
 			for (int j = 0; j < vehicle.currentTour.size(); j++) {
 				Stopp stopp = vehicle.currentTour.get(j);
@@ -404,27 +395,33 @@ public class Touring {
 					int currentCapacity = vehicle.getCapacity();
 					int updatedCapacity = currentCapacity + passengersOfStopp;
 					vehicle.setCapacity(updatedCapacity);
-
-					for (Request requestOfList : requests) {
+					searchPassengers: for (Request requestOfList : requests) {
 						int id = requestOfList.getId();
 						if (id == requestId) {
 							requestOfList.setPassengerState(2);
-							break;
+							break searchPassengers;
 						}
 					}
+					int idOfPickedUpRequest = stopp.getRequestId();
+					double pickUpTime = stopp.getPlannedDeaparture();
+					DriveTimesOfCustomers driveTimeOfCustomer = new DriveTimesOfCustomers(idOfPickedUpRequest,pickUpTime,0.0);
+					driveTimes.add(driveTimeOfCustomer);
+					
 				} else if (stoppType == 3) {
 					int passengersOfStopp = stopp.getPassengers();
 					int currentCapacity = vehicle.getCapacity();
 					int updatedCapacity = currentCapacity - passengersOfStopp;
 					vehicle.setCapacity(updatedCapacity);
-
-					for (Request requestOfList : requests) {
-						int id = requestOfList.getId();
-						if (id == requestId) {
-							requestOfList.setPassengerState(2);
-							break;
+					searchDriveTime: for(DriveTimesOfCustomers driveTime : driveTimes){
+						int idOfRequest = stopp.getRequestId();
+						int id = driveTime.getRequestId();
+						double dropOffTime = stopp.getPlannedDeaparture();
+						if(idOfRequest == id){
+							driveTime.setDropOffTime(dropOffTime);
+							break searchDriveTime;
 						}
 					}
+
 				}
 			}
 		}

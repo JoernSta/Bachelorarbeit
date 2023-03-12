@@ -24,11 +24,11 @@ public class waitingStrategies {
 	}
 	/**
 	 * Diese Methode bestimmt alle Punkte welche von der aktuellen Position aus erreicht werden können.
-	 * @param points
-	 * @param vehicle
-	 * @param currentTime
-	 * @param endTime
-	 * @param targetPoint
+	 * @param points Liste aller Punkte aus dem Servicegebiet
+	 * @param vehicle das derzeit betrachtete Fahrzeug
+	 * @param currentTime die aktuelle Zeit
+	 * @param endTime Die Zeit, wann der Betriebshorizont zu Ende geht.
+	 * @param targetPoint der Zielpunkt, welcher angefahren werden soll, nur von Relevanz 
 	 * @return
 	 */
 	public static ArrayList<Point> calculateReachablePoints(ArrayList<Point> points, Vehicle vehicle, double currentTime,double endTime,Point targetPoint){
