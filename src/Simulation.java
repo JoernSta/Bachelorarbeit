@@ -356,7 +356,7 @@ File requestsWith120Customers = new File("100_customer.csv");
 		//startSimulation(waitingStrategyWaitFirst,startTime,endTime,allRequests2,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
 		
 		//Test mit Strategie WaitFirst und 100 Anfragen:
-		startSimulation(waitingStrategyWaitFirst,startTime,endTime,allRequests3,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
+		//startSimulation(waitingStrategyWaitFirst,startTime,endTime,allRequests3,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);
 		
 		//Test mit Strategie WaitFirst und 50 Anfragen:
 		//startSimulation(waitingStrategyWaitFirst,startTime,endTime,allRequests,allVehicles,maxWaitingTime,maxDrivingTime,capacity,maxMovingPosition);

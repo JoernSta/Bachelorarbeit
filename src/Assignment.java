@@ -230,7 +230,8 @@ public class Assignment {
 							Stopp dropOffStopp = new Stopp(requestId, dropOffPoint, arrivalAtDropOff, 3, arrivalAtDropOff,latestArrivalAtDropOff , passengers, 0, serviceTime, serviceType);
 							tour.add(indexOfPickUpPoint, pickUpStopp);
 							tour.add(indexOfDropOffPoint, dropOffStopp);
-							//Hier soll dann die cheapest Insertion der Drop-Off Punkte erfolgen, also der kuerzeste Weg.
+							
+							//Hier soll dann die cheapest Insertion der erfolgen, also der kuerzeste Weg.
 							//Betrachte das Intervall von dem ersten Drop-Off Punkt des Servicetypen + Requestypen der betrachteten Request.
 							double waitingTime = arrivalTimeAtPickUpPoint - serviceTime;
 							AssignedVehicle potentialVehicle = new AssignedVehicle(vehicle, tour, waitingTime);
